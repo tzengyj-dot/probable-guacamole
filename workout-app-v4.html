@@ -1,0 +1,1490 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="健身💪">
+<meta name="theme-color" content="#0e0e0e">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%230e0e0e'/><stop offset='1' stop-color='%231a1a1a'/></linearGradient></defs><rect width='100' height='100' rx='22' fill='url(%23g)'/><rect x='8' y='8' width='84' height='84' rx='18' fill='none' stroke='%23d4ff4e' stroke-width='2' opacity='.3'/><text y='52' x='50' font-size='46' text-anchor='middle' dominant-baseline='middle'>💪</text><text y='82' x='30' font-size='20' text-anchor='middle'>🐬</text><text y='82' x='70' font-size='20' text-anchor='middle'>🦥</text></svg>">
+<title>居家健身</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Bebas+Neue&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0e0e0e;--surface:#161616;--card:#1c1c1c;--border:#2a2a2a;--accent:#d4ff4e;--accent2:#ff6b35;--accent3:#4ecdc4;--text:#f0f0f0;--muted:#888;--warm:#ffb347;--green:#97C459;--green-dark:#27500A;--green-bg:#EAF3DE}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-serif;font-weight:300}
+#app{height:100vh;display:flex;flex-direction:column;max-width:480px;margin:0 auto}
+.hdr{padding:env(safe-area-inset-top,16px) 16px 12px;border-bottom:1px solid var(--border);flex-shrink:0;padding-top:max(env(safe-area-inset-top),16px)}
+.hdr-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.hdr-title{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:1px;line-height:1}
+.hdr-btns{display:flex;gap:6px}
+.timer-btn{font-size:12px;padding:7px 13px;border:1px solid var(--border);border-radius:8px;background:var(--card);cursor:pointer;color:var(--accent);font-family:'DM Mono',monospace}
+.user-switch-btn{height:30px;padding:0 10px;border-radius:20px;border:1.5px solid var(--border);background:var(--card);cursor:pointer;font-size:11px;font-family:'DM Mono',monospace;font-weight:500;letter-spacing:.5px;display:flex;align-items:center;gap:5px;transition:all .2s;white-space:nowrap}
+.user-switch-btn.aura{border-color:#ff8fab;background:rgba(255,143,171,.12);color:#ff8fab}
+.user-switch-btn.yinjie{border-color:#4ecdc4;background:rgba(78,205,196,.12);color:#4ecdc4}
+.week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.wday{text-align:center;padding:6px 2px;border-radius:6px;border:1px solid var(--border);background:var(--card);cursor:pointer;transition:all .15s;-webkit-user-select:none;user-select:none}
+.wday:active{background:#252525}
+.wday.today{border-color:var(--green);background:rgba(151,196,89,0.1)}
+.wday.has-workout{border-color:#333}
+.wday.has-workout:hover{border-color:var(--accent);background:rgba(212,255,78,.05)}
+.wday.selected-week{border-color:var(--accent);background:rgba(212,255,78,.08)}
+.wday.rest-day{opacity:.4;cursor:default}
+.wday-label{font-size:9px;color:var(--muted);letter-spacing:.5px;margin-bottom:2px;font-family:'DM Mono',monospace}
+.wday-date{font-size:11px;font-weight:500}
+.wday.today .wday-date{color:var(--green)}
+.wday.selected-week .wday-date{color:var(--accent)}
+.wday-dot{width:5px;height:5px;border-radius:50%;background:var(--green);margin:3px auto 0}
+.wday-pip{width:5px;height:5px;border-radius:50%;background:var(--accent);margin:3px auto 0;opacity:.6}
+.day-tabs{display:flex;gap:6px;padding:10px 16px;overflow-x:auto;border-bottom:1px solid var(--border);flex-shrink:0;-webkit-overflow-scrolling:touch}
+.day-tabs::-webkit-scrollbar{display:none}
+.day-tab{flex-shrink:0;padding:7px 14px;border-radius:8px;border:1px solid var(--border);background:var(--card);font-size:13px;cursor:pointer;color:var(--muted);transition:all .15s;font-family:'Noto Sans TC',sans-serif}
+.day-tab.active{background:rgba(212,255,78,.1);border-color:var(--accent);color:var(--accent);font-weight:500}
+.scroll-area{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:80px}
+.scroll-area::-webkit-scrollbar{display:none}
+.workout-hdr{padding:14px 16px 12px;background:var(--surface);border-bottom:1px solid var(--border)}
+.workout-title-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.workout-name{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:1px;line-height:1}
+.workout-sub{font-size:12px;color:var(--muted);margin-top:3px}
+.workout-mins-num{font-family:'Bebas Neue',sans-serif;font-size:28px;text-align:right;line-height:1}
+.workout-mins-label{font-size:10px;color:var(--muted);text-align:right;font-family:'DM Mono',monospace}
+.prog-wrap{height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:5px}
+.prog-bar{height:100%;background:var(--green);border-radius:2px;transition:width .3s}
+.prog-label{font-size:11px;color:var(--muted);display:flex;justify-content:space-between;font-family:'DM Mono',monospace}
+.section-hdr{padding:9px 16px;background:var(--surface);border-bottom:1px solid var(--border);border-top:5px solid var(--bg);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px}
+.section-hdr-left{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.s-badge{display:inline-block;font-size:10px;padding:2px 10px;border-radius:3px;font-family:'DM Mono',monospace;letter-spacing:1px;text-transform:uppercase}
+.bw{background:rgba(255,179,71,.15);color:var(--warm)}
+.bm{background:rgba(212,255,78,.1);color:var(--accent)}
+.bh{background:rgba(255,107,53,.15);color:var(--accent2)}
+.bc{background:rgba(78,205,196,.12);color:var(--accent3)}
+.s-time{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace}
+.s-note{font-size:11px;color:var(--muted);margin-top:4px;width:100%}
+.hiit-timer-btn{font-size:11px;padding:4px 10px;border:1px solid var(--accent2);border-radius:6px;background:rgba(255,107,53,.1);cursor:pointer;color:var(--accent2);font-family:'DM Mono',monospace;flex-shrink:0}
+
+/* Exercise rows */
+.ex-row{border-bottom:1px solid var(--border);background:var(--card);-webkit-user-select:none;user-select:none}
+.ex-row-main{display:flex;align-items:flex-start;gap:12px;padding:13px 16px;transition:background .1s}
+.ex-row.chk .ex-row-main{background:#111}
+.ex-chk{width:20px;height:20px;border-radius:4px;border:1.5px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:1px;transition:all .15s;cursor:pointer}
+.ex-chk.on{background:var(--green);border-color:var(--green)}
+.ex-chk.on::after{content:'✓';font-size:11px;color:#0e0e0e;font-weight:900}
+.ex-info{flex:1;min-width:0}
+.ex-name{font-size:14px;font-weight:400;transition:all .15s;cursor:pointer}
+.ex-row.chk .ex-name{color:#555;text-decoration:line-through}
+.ex-brief{font-size:11px;color:var(--muted);margin-top:2px;font-style:italic}
+.ex-row.chk .ex-brief{color:#444}
+.ex-sets-col{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0}
+.ex-sets{font-size:12px;color:var(--muted);text-align:right;font-family:'DM Mono',monospace}
+.ex-row.chk .ex-sets{color:#444}
+/* Set counter tap area */
+.set-counter{display:flex;align-items:center;gap:5px;cursor:pointer;padding:3px 0}
+.set-counter-track{display:flex;gap:3px}
+.set-pip{width:10px;height:10px;border-radius:50%;border:1.5px solid var(--border);background:transparent;transition:all .2s;flex-shrink:0}
+.set-pip.done{background:var(--green);border-color:var(--green)}
+.set-pip.done-last{background:var(--accent);border-color:var(--accent)}
+.set-counter-label{font-size:11px;font-family:'DM Mono',monospace;color:var(--muted);min-width:24px;text-align:right}
+.set-counter-label.full{color:var(--green)}
+.ex-expand-icon{font-size:10px;color:var(--muted);margin-left:6px;transition:transform .2s;display:inline-block}
+.ex-expand-icon.open{transform:rotate(180deg)}
+
+/* Expanded detail panel */
+.ex-detail{display:none;padding:0 16px 14px 48px;background:#111;border-top:1px solid #222}
+.ex-detail.open{display:block}
+.ex-detail-inner{padding-top:12px}
+.ex-d-section{margin-bottom:10px}
+.ex-d-label{font-size:9px;letter-spacing:1.5px;color:var(--muted);font-family:'DM Mono',monospace;text-transform:uppercase;margin-bottom:5px}
+.ex-d-text{font-size:12px;color:#ccc;line-height:1.6}
+.ex-d-cues{display:flex;flex-direction:column;gap:4px;margin-top:4px}
+.ex-d-cue{font-size:12px;color:#bbb;display:flex;gap:6px;line-height:1.5}
+.ex-d-cue-icon{flex-shrink:0;font-size:13px}
+.ex-d-muscles{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
+.ex-d-muscle{font-size:10px;padding:2px 8px;border-radius:3px;background:rgba(255,255,255,.06);color:var(--muted);font-family:'DM Mono',monospace}
+.ex-d-avoid{font-size:11px;color:#ff6b6b;margin-top:4px;display:flex;gap:5px;align-items:flex-start}
+
+.bottom-bar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;padding:10px 16px;padding-bottom:max(env(safe-area-inset-bottom),10px);background:linear-gradient(transparent,var(--bg) 30%);display:flex;gap:8px}
+.btn-reset{flex:1;padding:12px;border:1px solid var(--border);border-radius:10px;background:var(--card);cursor:pointer;font-size:13px;color:var(--muted);font-family:'Noto Sans TC',sans-serif}
+.btn-done{flex:2;padding:12px;border:1px solid var(--border);border-radius:10px;background:var(--card);cursor:pointer;font-size:13px;font-weight:500;color:var(--muted);transition:all .2s;font-family:'Noto Sans TC',sans-serif}
+.btn-done.ready{background:var(--accent);border-color:var(--accent);color:#0e0e0e}
+
+/* Rest Timer Overlay */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:100;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px}
+.timer-box{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px 32px;text-align:center;min-width:260px}
+.tl{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:3px;text-transform:uppercase;margin-bottom:14px}
+.tring{margin:0 auto 16px;width:110px;height:110px;position:relative}
+.tsvg{transform:rotate(-90deg)}
+.tnum{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:2px;color:var(--text)}
+.tnum.go{color:var(--accent)}
+.tpresets{display:flex;gap:6px;justify-content:center;margin-bottom:16px}
+.tp{padding:6px 16px;border:1px solid var(--border);border-radius:6px;background:var(--surface);cursor:pointer;font-size:12px;font-family:'DM Mono',monospace;color:var(--muted)}
+.tp.on{background:rgba(212,255,78,.1);border-color:var(--accent);color:var(--accent)}
+.tbtns{display:flex;gap:8px;justify-content:center}
+.tctrl{padding:9px 22px;border:1px solid var(--border);border-radius:8px;background:var(--surface);cursor:pointer;font-size:13px;color:var(--text);font-family:'Noto Sans TC',sans-serif}
+.tclose{padding:9px 22px;border:1px solid var(--border);border-radius:8px;background:transparent;cursor:pointer;font-size:13px;color:var(--muted);font-family:'Noto Sans TC',sans-serif}
+
+/* Auto Rest Popup */
+.rest-popup{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);width:calc(100% - 32px);max-width:448px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 20px;z-index:90;display:flex;align-items:center;gap:14px;box-shadow:0 8px 32px rgba(0,0,0,.6);animation:slideUp .25s ease}
+@keyframes slideUp{from{transform:translateX(-50%) translateY(20px);opacity:0}to{transform:translateX(-50%) translateY(0);opacity:1}}
+.rest-popup-left{flex:1}
+.rest-popup-label{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:3px}
+.rest-popup-exname{font-size:13px;color:var(--text);font-weight:500;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rest-popup-intensity{font-size:11px;color:var(--muted)}
+.rest-popup-ring{width:52px;height:52px;position:relative;flex-shrink:0}
+.rest-popup-ring svg{transform:rotate(-90deg)}
+.rest-popup-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--accent)}
+.rest-popup-skip{padding:8px 16px;border:1px solid var(--border);border-radius:8px;background:var(--surface);cursor:pointer;font-size:12px;color:var(--muted);font-family:'Noto Sans TC',sans-serif;flex-shrink:0}
+
+/* HIIT Timer Overlay */
+.hiit-overlay{position:fixed;inset:0;background:#0a0a0a;z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0}
+.hiit-phase{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:4px;margin-bottom:8px;transition:color .3s}
+.hiit-phase.work{color:var(--accent2)}
+.hiit-phase.rest{color:var(--accent3)}
+.hiit-ex-name{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:2px;text-align:center;padding:0 24px;margin-bottom:6px;line-height:1.1}
+.hiit-next{font-size:12px;color:var(--muted);margin-bottom:28px;font-family:'DM Mono',monospace}
+.hiit-ring{margin:0 auto 24px;width:160px;height:160px;position:relative}
+.hiit-ring svg{transform:rotate(-90deg)}
+.hiit-ring-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:72px;letter-spacing:2px}
+.hiit-round-info{font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:24px;letter-spacing:1px}
+.hiit-prog-dots{display:flex;gap:6px;justify-content:center;margin-bottom:28px}
+.hiit-dot{width:8px;height:8px;border-radius:50%;background:var(--border);transition:all .3s}
+.hiit-dot.done{background:var(--green)}
+.hiit-dot.current{background:var(--accent2);transform:scale(1.2)}
+.hiit-btns{display:flex;gap:10px}
+.hiit-btn{padding:12px 28px;border-radius:10px;border:1px solid var(--border);background:var(--card);cursor:pointer;font-size:14px;color:var(--text);font-family:'Noto Sans TC',sans-serif}
+.hiit-btn.primary{background:var(--accent2);border-color:var(--accent2);color:#fff;font-weight:500}
+.hiit-btn.rest-c{background:rgba(78,205,196,.15);border-color:var(--accent3);color:var(--accent3)}
+
+/* Bottom Nav */
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;display:flex;border-top:1px solid var(--border);background:var(--bg);z-index:50;padding-bottom:env(safe-area-inset-bottom)}
+.nav-btn{flex:1;padding:10px 0 8px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;border:none;background:transparent;color:var(--muted);font-size:10px;font-family:'Noto Sans TC',sans-serif;transition:color .15s}
+.nav-btn.active{color:var(--accent)}
+.nav-btn-icon{font-size:20px;line-height:1}
+
+/* Page system */
+.page{display:none;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:120px;height:calc(100vh - 130px);margin-top:0}
+.page::-webkit-scrollbar{display:none}
+.page.active{display:block}
+
+/* History page */
+.hist-section{padding:16px}
+.hist-month-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--text);margin-bottom:12px}
+.heatmap{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:20px}
+.hm-cell{aspect-ratio:1;border-radius:4px;background:var(--border);cursor:pointer;transition:all .15s;position:relative}
+.hm-cell.has-data{background:rgba(151,196,89,0.25)}
+.hm-cell.has-data:active{background:rgba(151,196,89,0.5)}
+.hm-cell.today-cell{outline:2px solid var(--green);outline-offset:1px}
+.hist-day-detail{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px}
+.hist-day-title{font-size:13px;font-weight:500;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.hist-day-badge{font-size:10px;padding:2px 8px;border-radius:3px;background:rgba(151,196,89,0.15);color:var(--green);font-family:'DM Mono',monospace}
+.hist-ex-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid #222;font-size:12px}
+.hist-ex-row:last-child{border-bottom:none}
+.hist-ex-name{color:#bbb;flex:1}
+.hist-ex-sets{font-family:'DM Mono',monospace;color:var(--green);font-size:11px}
+.hist-empty{text-align:center;padding:40px 20px;color:var(--muted);font-size:13px}
+
+/* Edit overlay */
+.edit-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:300;display:flex;align-items:flex-end;justify-content:center}
+.edit-sheet{background:var(--surface);border-radius:16px 16px 0 0;width:100%;max-width:480px;padding:20px 20px max(env(safe-area-inset-bottom),20px);max-height:80vh;overflow-y:auto}
+.edit-sheet::-webkit-scrollbar{display:none}
+.edit-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;margin-bottom:16px}
+.edit-field{margin-bottom:14px}
+.edit-label{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px}
+.edit-input{width:100%;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-size:14px;font-family:'Noto Sans TC',sans-serif;outline:none}
+.edit-input:focus{border-color:var(--accent)}
+.edit-btns{display:flex;gap:8px;margin-top:20px}
+.edit-save{flex:2;padding:12px;background:var(--accent);border:none;border-radius:10px;color:#0e0e0e;font-size:14px;font-weight:500;cursor:pointer;font-family:'Noto Sans TC',sans-serif}
+.edit-cancel{flex:1;padding:12px;background:var(--card);border:1px solid var(--border);border-radius:10px;color:var(--muted);font-size:14px;cursor:pointer;font-family:'Noto Sans TC',sans-serif}
+.edit-btn-inline{font-size:10px;padding:3px 8px;border:1px solid var(--border);border-radius:4px;background:transparent;color:var(--muted);cursor:pointer;font-family:'DM Mono',monospace;margin-left:8px;vertical-align:middle}
+
+/* Assessment */
+.assess-opt{width:100%;padding:11px 16px;border:1px solid var(--border);border-radius:10px;background:var(--surface);cursor:pointer;font-size:14px;color:var(--text);font-family:'Noto Sans TC',sans-serif;text-align:left;transition:all .15s}
+.assess-opt:active{background:rgba(212,255,78,.1);border-color:var(--accent)}
+.assess-opt.sel{background:rgba(212,255,78,.12);border-color:var(--accent);color:var(--accent)}
+
+/* Countdown */
+#cdNum{color:var(--accent)}
+#cdNum.go{color:var(--accent2);font-size:120px}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="hdr">
+    <div class="hdr-top">
+      <div class="hdr-title">居家健身 💪</div>
+      <div class="hdr-btns">
+        <button class="timer-btn" onclick="openTimer()">⏱ 休息計時</button>
+        <button class="user-switch-btn" id="userSwitchBtn" onclick="switchUser()"></button>
+      </div>
+    </div>
+    <div class="week-grid" id="weekGrid"></div>
+  </div>
+  <div class="day-tabs" id="dayTabs"></div>
+
+  <!-- Workout Page -->
+  <div class="page active" id="pageWorkout">
+    <div id="workoutContent"></div>
+  </div>
+
+  <!-- History Page -->
+  <div class="page" id="pageHistory">
+    <div class="hist-section" id="histContent"></div>
+  </div>
+
+  <!-- Bottom Nav -->
+  <div class="bottom-nav">
+    <button class="nav-btn active" id="navWorkout" onclick="switchPage('workout')">
+      <span class="nav-btn-icon">🏋️</span>訓練
+    </button>
+    <button class="nav-btn" id="navHistory" onclick="switchPage('history')">
+      <span class="nav-btn-icon">📊</span>紀錄
+    </button>
+  </div>
+
+  <!-- Action Bar -->
+  <div style="position:fixed;bottom:56px;left:50%;transform:translateX(-50%);width:100%;max-width:480px;padding:6px 16px;background:linear-gradient(transparent,var(--bg) 40%);display:flex;gap:8px;z-index:40" id="actionBar">
+    <button class="btn-reset" onclick="resetChecks()">重置</button>
+    <button class="btn-done" id="btnDone" onclick="markDone()">完成訓練</button>
+  </div>
+</div>
+
+<!-- Body Assessment Overlay -->
+<div class="overlay" id="assessOverlay" style="display:none">
+  <div class="timer-box" style="min-width:300px">
+    <div class="tl">今日狀態評估</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:20px;text-align:center">訓練前先評估今天的身體狀況</div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px" id="assessOptions">
+      <button class="assess-opt" onclick="selectAssess(1)">😴 很疲憊，撐不住</button>
+      <button class="assess-opt" onclick="selectAssess(2)">😕 有點累，狀態不好</button>
+      <button class="assess-opt" onclick="selectAssess(3)">😐 普通，正常發揮</button>
+      <button class="assess-opt" onclick="selectAssess(4)">😊 不錯，狀態良好</button>
+      <button class="assess-opt" onclick="selectAssess(5)">💪 超好！全力以赴</button>
+    </div>
+    <button class="tclose" onclick="closeAssessment()">取消</button>
+  </div>
+</div>
+
+<!-- Countdown Overlay (3-2-1-GO) -->
+<div class="overlay" id="countdownOverlay" style="display:none;background:rgba(0,0,0,.92)">
+  <div style="text-align:center">
+    <div style="font-size:14px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:2px;margin-bottom:16px" id="cdExName"></div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:140px;line-height:1;letter-spacing:4px;transition:all .15s" id="cdNum">3</div>
+    <div style="font-size:13px;color:var(--muted);margin-top:16px">準備好姿勢！</div>
+  </div>
+</div>
+
+<!-- Rest Timer -->
+<div class="overlay" id="timerOverlay" style="display:none">
+  <div class="timer-box">
+    <div class="tl">休息計時器</div>
+    <div class="tring">
+      <svg class="tsvg" width="110" height="110" viewBox="0 0 110 110">
+        <circle cx="55" cy="55" r="46" fill="none" stroke="#2a2a2a" stroke-width="7"/>
+        <circle id="tarc" cx="55" cy="55" r="46" fill="none" stroke="#d4ff4e" stroke-width="7" stroke-linecap="round"
+          stroke-dasharray="289.0" stroke-dashoffset="0"/>
+      </svg>
+      <div class="tnum" id="tnum">60</div>
+    </div>
+    <div class="tpresets">
+      <button class="tp" onclick="setPreset(30)">30s</button>
+      <button class="tp on" onclick="setPreset(60)">60s</button>
+      <button class="tp" onclick="setPreset(90)">90s</button>
+    </div>
+    <div class="tbtns">
+      <button class="tctrl" id="tctrl" onclick="toggleTimer()">暫停</button>
+      <button class="tclose" onclick="closeTimer()">關閉</button>
+    </div>
+  </div>
+</div>
+
+<!-- Auto Rest Popup -->
+<div class="rest-popup" id="restPopup" style="display:none">
+  <div class="rest-popup-left">
+    <div class="rest-popup-label">組間休息</div>
+    <div class="rest-popup-exname" id="restPopupName"></div>
+    <div class="rest-popup-intensity" id="restPopupIntensity"></div>
+  </div>
+  <div class="rest-popup-ring">
+    <svg width="52" height="52" viewBox="0 0 52 52">
+      <circle cx="26" cy="26" r="20" fill="none" stroke="#2a2a2a" stroke-width="4"/>
+      <circle id="restPopupArc" cx="26" cy="26" r="20" fill="none" stroke="#d4ff4e" stroke-width="4"
+        stroke-linecap="round" stroke-dasharray="125.7" stroke-dashoffset="0"/>
+    </svg>
+    <div class="rest-popup-num" id="restPopupNum">60</div>
+  </div>
+  <button class="rest-popup-skip" onclick="skipRest()">跳過</button>
+</div>
+
+<!-- HIIT Timer -->
+<div class="hiit-overlay" id="hiitOverlay" style="display:none">
+  <div class="hiit-phase" id="hiitPhase">準備</div>
+  <div class="hiit-ex-name" id="hiitExName">準備開始</div>
+  <div class="hiit-next" id="hiitNext"></div>
+  <div class="hiit-ring">
+    <svg width="160" height="160" viewBox="0 0 160 160">
+      <circle cx="80" cy="80" r="68" fill="none" stroke="#2a2a2a" stroke-width="9"/>
+      <circle id="hiitArc" cx="80" cy="80" r="68" fill="none" stroke="#ff6b35" stroke-width="9"
+        stroke-linecap="round" stroke-dasharray="427.3" stroke-dashoffset="0"/>
+    </svg>
+    <div class="hiit-ring-num" id="hiitNum">5</div>
+  </div>
+  <div class="hiit-round-info" id="hiitRoundInfo">第 1 輪 / 共 3 輪</div>
+  <div class="hiit-prog-dots" id="hiitDots"></div>
+  <div class="hiit-btns">
+    <button class="hiit-btn" id="hiitCtrl" onclick="toggleHiit()">暫停</button>
+    <button class="hiit-btn" onclick="closeHiit()">結束</button>
+  </div>
+</div>
+
+<script>
+// ─────────────── WORKOUT DATA ───────────────
+// All exercise details verified for safety and correctness
+const WD_YINJIE={
+  1:{title:"上肢推力",sub:"胸 · 肩 · 三頭",e:"💪",m:30,s:[
+    {t:"w",l:"熱身",d:"5 min",exs:[
+      {n:"手臂大繞環",s:"×15圈",brief:"活動肩關節",
+        muscles:["肩關節","旋轉肌群"],
+        cues:["🔄 雙手平舉，手掌朝下","⭕ 向前繞大圈15次，向後再15次","😮‍💨 動作幅度越大越好，不要聳肩"],
+        avoid:"避免聳肩代償，感覺到肩膀有溫熱感即可"},
+      {n:"胸椎旋轉（四足跪姿）",s:"×10每側",brief:"活動胸椎",
+        muscles:["胸椎","背部旋轉肌"],
+        cues:["🐾 四足跪姿：手腕在肩膀正下方，膝蓋在髖部正下方","🤚 一手放頭後方","🔄 用手肘帶動上背向上旋轉，眼睛跟著看","⬇️ 再緩緩轉回，重複10次換邊"],
+        avoid:"腰椎不要跟著旋轉，只動上背"},
+      {n:"貓牛式",s:"×12次",brief:"暖身脊椎",
+        muscles:["脊椎伸肌","腹肌"],
+        cues:["🐄 吸氣：腹部下沉，頭尾抬起（牛式）","🐱 吐氣：拱背，下巴收，尾骨收（貓式）","🐾 膝蓋在髖下方，手腕在肩下方","⏱ 每個動作停頓1秒"],
+        avoid:"腰部不要過度塌陷，感覺是從頸椎到尾骨逐節活動"},
+      {n:"跪姿伏地挺身（熱身）",s:"×10次",brief:"喚醒胸肌",
+        muscles:["胸大肌","三角肌前束","三頭肌"],
+        cues:["🙏 膝蓋著地，髖部不要翹起，身體保持一直線","👐 雙手略寬於肩膀","⬇️ 胸口貼近地面（不是鼻子）","⬆️ 推回時手肘不要完全鎖死"],
+        avoid:"臀部不要翹高或下沉"},
+    ]},
+    {t:"m",l:"主訓練",d:"",exs:[
+      {n:"標準伏地挺身",s:"3×10",brief:"胸肌主力動作",
+        muscles:["胸大肌","三角肌前束","三頭肌","核心"],
+        cues:["👐 手掌略寬於肩，手指朝前或略外","📏 身體從頭到腳跟呈一直線","⬇️ 胸口（乳頭位置）貼近地面","🔒 全程收緊腹部，不塌腰不拱背","⬆️ 推起時呼氣，不要完全鎖死手肘"],
+        avoid:"臀部不要翹高；下巴不要先碰地；不要聳肩"},
+      {n:"窄距伏地挺身",s:"3×8",brief:"主攻三頭",
+        muscles:["三頭肌","胸大肌（內側）","三角肌前束"],
+        cues:["🙌 雙手置於胸口正下方，拇指距離約10cm","📐 手肘緊貼身體兩側下降","⬇️ 胸口緩降至手背上方","⬆️ 推起時三頭肌出力"],
+        avoid:"手肘不要向外張開；手腕保持直立不要彎折"},
+      {n:"Pike Push-Up（肩推式）",s:"3×8",brief:"主攻肩部",
+        muscles:["三角肌（前束＋中束）","三頭肌","上斜方肌"],
+        cues:["🔺 從平板支撐走腳向手靠攏，臀部抬高呈倒V形","📍 頭頂對準兩手之間的地板","⬇️ 彎曲手肘，頭頂緩降向地面","⬆️ 推起，全程保持倒V形不要塌腰"],
+        avoid:"腰部不要塌陷；臀部不要下降成平板支撐"},
+      {n:"椅子撐體 Dips 🪑",s:"3×10",brief:"三頭為主",
+        muscles:["三頭肌","三角肌後束","胸大肌（下側）"],
+        cues:["🪑 雙手撐在椅緣，手指朝前，手臂伸直","🦵 腳略向前伸，膝蓋彎曲（較易）或伸直（較難）","⬇️ 身體緩慢下沉，手肘彎曲至90°","⬆️ 三頭肌用力推回","📏 背部保持靠近椅子，不要讓身體前傾"],
+        avoid:"不要讓肩膀聳起；身體不要向前傾斜太多，以免肩關節受傷"},
+      {n:"超人式",s:"3×12",brief:"強化下背",
+        muscles:["豎脊肌","臀大肌","後三角肌","腿後側"],
+        cues:["🤸 俯臥，手臂向前伸直，掌心朝下，雙腿伸直","⬆️ 同時抬起雙臂與雙腿，離地約10-15cm","⏱ 頂端停頓2秒，感受下背與臀部收縮","⬇️ 緩慢放回，不要直接讓肢體摔落"],
+        avoid:"頸部不要過度後仰；量力而為，不要強迫高度"},
+    ]},
+    {t:"c",l:"收操伸展",d:"5 min",exs:[
+      {n:"胸肌牆角伸展 🧱",s:"30秒×2",brief:"伸展胸肌",
+        muscles:["胸大肌","三角肌前束"],
+        cues:["🧱 面對牆角，雙臂抬至肩膀高度，手肘彎曲90°貼牆","🚶 身體緩慢向前靠近牆角，感覺胸肌被拉開","😮‍💨 深呼吸，維持30秒不要憋氣"],
+        avoid:"不要讓頸部向前推進；感到疼痛立刻停止"},
+      {n:"三頭肌過頭伸展",s:"30秒×每側",brief:"伸展三頭",
+        muscles:["三頭肌"],
+        cues:["💪 一手舉過頭頂，手肘彎曲，手心觸摸後頸或上背","🤝 另一手握住彎曲手肘輕輕向下壓","😌 感覺上臂後側伸展，維持30秒","🔄 換邊重複"],
+        avoid:"不要拉扯過猛；頸部保持中立不要前傾"},
+      {n:"肩膀前側伸展",s:"30秒×2",brief:"伸展前三角肌",
+        muscles:["三角肌前束","胸小肌"],
+        cues:["🙏 雙手在身後十指交扣","⬆️ 挺胸，肩胛骨向後夾，雙手輕輕向後下方延伸","🙄 頭微微抬起","😮‍💨 深呼吸維持30秒"],
+        avoid:"不要過度抬頭；雙手不要用力拉扯"},
+      {n:"嬰兒式",s:"40秒",brief:"放鬆肩背",
+        muscles:["背闊肌","脊椎伸肌","肩關節"],
+        cues:["🐾 跪坐，臀部往後坐向腳跟","🙌 雙手向前伸直，額頭放鬆貼地","😮‍💨 每次呼氣讓身體更下沉","🌊 感覺整個背部被拉長放鬆"],
+        avoid:"若膝蓋不適可在臀部下方墊枕頭"},
+    ]}
+  ]},
+  2:{title:"下肢＋臀部",sub:"股四頭 · 腿後 · 臀部",e:"🦵",m:30,s:[
+    {t:"w",l:"熱身",d:"5 min",exs:[
+      {n:"髖關節繞環",s:"×10每腳",brief:"活動髖關節",
+        muscles:["髖屈肌","臀中肌","髖關節囊"],
+        cues:["🦵 站立，單腳抬起膝蓋至腰部高度","⭕ 以膝蓋帶動大腿，向外旋轉大圓圈10次","🔄 再向內旋轉10次，換腳"],
+        avoid:"支撐腳膝蓋微彎不要鎖死；扶牆保持平衡"},
+      {n:"腿後側動態伸展",s:"×12每腳",brief:"活化腿後側",
+        muscles:["腿後腱肌群","小腿"],
+        cues:["🚶 站立，單腳向前踢直，腳趾勾起朝天","💫 踢腿動作流暢但不要猛力","🔄 交替腳各12次","✋ 扶牆保持平衡"],
+        avoid:"膝蓋不要鎖死；不要強迫高度，量力而為"},
+      {n:"淺蹲開合跳",s:"30秒",brief:"活化股四頭＋心肺",
+        muscles:["股四頭肌","臀中肌","心肺"],
+        cues:["🏋️ 保持半蹲（膝蓋約彎45°）姿勢","👐 雙腳向外跳開，再跳回","🔥 全程保持半蹲，不要完全站起"],
+        avoid:"膝蓋方向要對齊腳趾，不要內扣"},
+      {n:"原地弓步走",s:"×10每腳",brief:"拉開髖屈肌",
+        muscles:["髖屈肌","臀大肌","股四頭肌"],
+        cues:["🚶 大步向前踏出，前腳膝蓋彎約90°","📏 後腳膝蓋輕觸或接近地面","⬆️ 前腳踩地站起，換腳重複","🎯 上身保持直立，不要前傾"],
+        avoid:"前腳膝蓋不要超過腳趾太多；膝蓋對齊第二趾"},
+    ]},
+    {t:"m",l:"主訓練",d:"",exs:[
+      {n:"深蹲",s:"4×12",brief:"下肢主力動作",
+        muscles:["股四頭肌","臀大肌","腿後腱肌群","核心"],
+        cues:["👣 雙腳與肩同寬或略寬，腳尖約外轉15-30°","⬇️ 臀部往後往下坐，大腿蹲至平行地面","🦵 膝蓋對齊腳趾方向（不要內扣）","⬆️ 起身時夾緊臀部，腳掌均勻踩地","🔒 全程腰背保持中立，不駝背不過度前傾"],
+        avoid:"膝蓋不要向內塌陷；腰部不要過度圓背；腳跟不要離地"},
+      {n:"保加利亞分腿蹲 🛏️",s:"3×8每腳",brief:"強化單腿力量",
+        muscles:["臀大肌","股四頭肌","腿後腱肌群","核心（穩定）"],
+        cues:["🛏️ 後腳腳背搭在床上或椅子上，高度約小腿肚","👣 前腳向前踏出，距床約一大步","⬇️ 彎曲前腳膝蓋，後腳膝蓋朝地板下降","📏 前腳膝蓋盡量不超過腳尖太多","⬆️ 前腳蹬地站起，臀部出力"],
+        avoid:"後腳不要用力蹬；身體不要過度前傾；先掌握平衡再加大幅度"},
+      {n:"臀橋",s:"4×15",brief:"主攻臀大肌",
+        muscles:["臀大肌","腿後腱肌群","核心"],
+        cues:["🛌 仰躺，膝蓋彎曲，腳掌平踩地面（距臀部約一拳）","⬆️ 腳掌踩地，臀部抬起至身體成一直線","🍑 頂端夾緊臀部停頓2秒","⬇️ 緩緩放回，臀部不要完全碰地再重複"],
+        avoid:"腰部不要過度拱起代償；用臀部出力，不是腰部"},
+      {n:"單腳臀橋",s:"3×8每腳",brief:"強化臀中肌",
+        muscles:["臀大肌","臀中肌","核心"],
+        cues:["🛌 仰躺，一腳膝蓋彎曲踩地，另一腳伸直或彎曲懸空","⬆️ 單腳蹬地，臀部抬起至身體成一直線","🍑 頂端夾臀停頓1秒","⬇️ 緩緩放回"],
+        avoid:"骨盆不要歪斜；懸空腳不要幫忙出力"},
+      {n:"側步蹲",s:"3×10每腳",brief:"強化臀中肌",
+        muscles:["臀中肌","股四頭肌","內收肌"],
+        cues:["👣 雙腳站寬約兩倍肩寬","⬇️ 重心移向一側，彎曲該側膝蓋蹲下","📏 蹲下的腳膝蓋對齊腳趾","➡️ 另一腳伸直，腳掌平踩地面","⬆️ 用蹲側腳臀部出力站回"],
+        avoid:"膝蓋不要向內扣；腰部保持中立不要圓背"},
+      {n:"提踵（扶牆）",s:"3×20",brief:"訓練小腿",
+        muscles:["腓腸肌","比目魚肌"],
+        cues:["🧱 扶牆站立，雙腳與肩同寬","⬆️ 腳跟抬起至最高點，停頓1秒","⬇️ 緩慢放回，腳跟輕觸地面","🔄 保持節奏，不要彈跳"],
+        avoid:"不要讓腳踝內翻或外翻；動作要慢，感受小腿肌肉全程收縮"},
+    ]},
+    {t:"c",l:"收操伸展",d:"5 min",exs:[
+      {n:"股四頭肌伸展",s:"35秒×每腳",brief:"伸展大腿前側",
+        muscles:["股四頭肌","髖屈肌"],
+        cues:["🧱 扶牆站立，單腳後勾，手握腳踝","🦵 保持膝蓋併攏（伸展腳與站立腳並排）","⬆️ 輕輕往後上方提起腳踝，感受大腿前側伸展","😮‍💨 深呼吸維持35秒"],
+        avoid:"不要讓伸展側的膝蓋向外偏移；若平衡困難可扶牆"},
+      {n:"低弓步髖屈肌伸展",s:"35秒×每側",brief:"伸展髖屈肌",
+        muscles:["髂腰肌","股直肌"],
+        cues:["🧎 一腳向前成弓步，後腳膝蓋跪地","⬆️ 身體直立，重心略向前移","😌 感覺後腳髖關節前方被拉開","😮‍💨 維持35秒不要憋氣，可以輕輕左右擺動增加伸展感"],
+        avoid:"前腳膝蓋不要超過腳尖太多；腰部不要過度後仰"},
+      {n:"坐姿腿後側伸展",s:"35秒×2",brief:"伸展腿後腱",
+        muscles:["腿後腱肌群","小腿"],
+        cues:["🧘 坐地，雙腿伸直向前","🙏 上身從髖部往前傾（不是彎腰駝背）","🎯 感覺大腿後側被拉伸，背部盡量保持平直","😮‍💨 深呼吸，每次吐氣嘗試更向前傾"],
+        avoid:"不要刻意彎腰駝背；膝蓋可以微彎不要鎖死"},
+      {n:"臀部鴿式伸展",s:"35秒×每側",brief:"伸展梨狀肌",
+        muscles:["梨狀肌","臀大肌","外旋六肌"],
+        cues:["🛌 仰躺，一腳膝蓋彎曲踩地","🦵 將另一腳的外踝搭在踩地腳的大腿上","🤗 雙手環抱踩地腳的大腿後側向胸口拉","😌 感覺搭腿側的臀部深層被伸展"],
+        avoid:"頸部放鬆貼地；不要讓骨盆歪斜"},
+      {n:"仰躺脊椎扭轉",s:"30秒×每側",brief:"放鬆腰椎",
+        muscles:["腰方肌","脊椎旋轉肌","梨狀肌"],
+        cues:["🛌 仰躺，雙臂向兩側打開呈T字形","🦵 一腳膝蓋彎曲橫倒向對側地板","👀 頭轉向膝蓋倒下的反方向","😮‍💨 深呼吸放鬆，維持30秒換邊"],
+        avoid:"肩膀盡量保持貼地；動作輕柔不要強迫"},
+    ]}
+  ]},
+  4:{title:"拉力＋核心",sub:"背部 · 二頭 · 核心",e:"🏋️",m:30,s:[
+    {t:"w",l:"熱身",d:"5 min",exs:[
+      {n:"貓牛式",s:"×12次",brief:"暖身脊椎",
+        muscles:["脊椎伸肌","腹肌"],
+        cues:["🐄 吸氣：腹部下沉，頭尾抬起（牛式）","🐱 吐氣：拱背，下巴收，尾骨收（貓式）","🐾 膝蓋在髖下方，手腕在肩下方","⏱ 每個動作停頓1秒"],
+        avoid:"腰部不要過度塌陷，感覺是從頸椎到尾骨逐節活動"},
+      {n:"肩胛骨後縮練習",s:"×15次",brief:"啟動肩胛肌群",
+        muscles:["菱形肌","中下斜方肌"],
+        cues:["🧍 站立，雙臂放鬆在身側","🔙 肩胛骨向脊椎方向夾緊，停頓2秒","↩️ 緩慢放鬆回到起始位置","💡 可以想像用兩側肩胛骨夾住一支鉛筆"],
+        avoid:"不要聳肩；只動肩胛骨，手臂不要用力"},
+      {n:"死蟲式（核心啟動）",s:"×8每側",brief:"啟動深層核心",
+        muscles:["腹橫肌","多裂肌","核心穩定肌"],
+        cues:["🛌 仰躺，雙臂垂直朝天，膝蓋彎曲90°抬起（桌面位置）","😮‍💨 先呼氣讓腰部完全貼地（最重要）","⬇️ 右臂向頭後方伸直，同時左腳向前伸直（不碰地）","⬆️ 緩慢回復，換邊重複","⏱ 全程腰部緊貼地面，動作要慢"],
+        avoid:"腰部離地即停止動作；不要憋氣；動作不要搶快"},
+    ]},
+    {t:"m",l:"主訓練",d:"",exs:[
+      {n:"床架仰臥划船 🛏️",s:"4×8",brief:"居家最佳練背動作",
+        muscles:["背闊肌","菱形肌","中下斜方肌","二頭肌"],
+        cues:["🛏️ 躺在床下或桌下，雙手抓住床架或桌沿，掌心朝自己","📏 手臂伸直，身體成一直線（腳跟著地）","⬆️ 將胸口拉向橫桿，手肘靠近身體兩側","🔙 頂端停頓，感受肩胛骨向後夾緊","⬇️ 緩慢伸直手臂放回"],
+        avoid:"不要用手腕力量代償；臀部不要下垂；身體要保持一直線"},
+      {n:"超人式（進階交替）",s:"3×10每側",brief:"強化下背",
+        muscles:["豎脊肌","臀大肌","後三角肌"],
+        cues:["🤸 俯臥，雙臂向前伸直","⬆️ 同時抬起右臂與左腿（對角線）","⏱ 頂端停頓3秒，感受下背與臀部收縮","⬇️ 緩慢放回，換側","💡 想像頭頂與腳跟往相反方向延伸"],
+        avoid:"頸部不要過度後仰；腰部不要感到劇烈疼痛"},
+      {n:"平板支撐",s:"4×30秒",brief:"核心穩定基礎",
+        muscles:["腹橫肌","腹直肌","核心穩定肌","肩關節穩定肌"],
+        cues:["💪 手肘在肩膀正下方，前臂平放地面","📏 身體從頭到腳跟成一直線","🔒 收緊腹部（如同肚子被打一拳）","😮‍💨 正常呼吸，不要憋氣","👀 眼睛看地面，頸部中立"],
+        avoid:"臀部不要翹高或下沉；不要憋氣；肩膀不要聳起"},
+      {n:"側平板支撐",s:"3×25秒每側",brief:"強化側腹",
+        muscles:["腹外斜肌","腹內斜肌","腰方肌","臀中肌"],
+        cues:["💪 側臥，手肘在肩膀正下方，前臂垂直身體","⬆️ 臀部抬離地面，身體側面成一直線","🔒 收緊腹部，臀部不要下沉或前傾","😮‍💨 正常呼吸維持25秒，換邊"],
+        avoid:"髖部不要向前或向後偏移；肩膀不要往耳朵靠近"},
+      {n:"捲腹",s:"3×15",brief:"訓練腹直肌",
+        muscles:["腹直肌","腹外斜肌"],
+        cues:["🛌 仰躺，膝蓋彎曲，腳掌平踩地面","🤲 雙手放在大腿上或輕扶頭後（不要拉頸部）","⬆️ 用腹肌出力，將上背離地約肩胛骨下緣","⏱ 頂端停頓1秒","⬇️ 緩慢放回，腰部始終貼地"],
+        avoid:"不要用手拉頸部；腰部不要離地（這是捲腹不是仰臥起坐）"},
+      {n:"鳥狗式",s:"3×10每側",brief:"核心穩定進階",
+        muscles:["多裂肌","腹橫肌","臀大肌","核心穩定肌"],
+        cues:["🐾 四足跪姿：手腕在肩下方，膝蓋在髖下方","⬆️ 右臂向前伸直，同時左腿向後伸直","📏 身體保持水平，不要歪斜","⏱ 頂端停頓2秒","⬇️ 緩慢放回，換邊"],
+        avoid:"腰椎不要旋轉；骨盆不要歪斜；動作要慢"},
+      {n:"登山者式",s:"3×16每腳",brief:"核心＋心肺",
+        muscles:["腹直肌","髖屈肌","肩關節穩定肌"],
+        cues:["💪 平板支撐姿勢（手掌撐地）","🏃 右膝快速向胸口收，再換左膝","🔁 雙腳交替，保持節奏","🔒 臀部不要抬高；腰部不要塌陷"],
+        avoid:"臀部不要高過肩膀；手腕不適可改用拳頭支撐"},
+    ]},
+    {t:"c",l:"收操伸展",d:"5 min",exs:[
+      {n:"背闊肌伸展（扶椅）🪑",s:"30秒×每側",brief:"伸展背闊肌",
+        muscles:["背闊肌","大圓肌"],
+        cues:["🪑 站在椅子旁，單手扶椅背","🏋️ 上身向扶椅側傾斜，感覺對側背部側面被拉開","😮‍💨 深呼吸維持30秒"],
+        avoid:"不要彎腰；膝蓋微彎"},
+      {n:"跨胸肩膀伸展",s:"30秒×每側",brief:"伸展後三角肌",
+        muscles:["三角肌後束","菱形肌"],
+        cues:["💪 一手伸直拉過胸前，約與肩同高","🤝 另一手在手肘處輕輕向身體壓","😌 感覺肩膀後側伸展","😮‍💨 維持30秒換邊"],
+        avoid:"不要轉動肩膀；頸部保持中立"},
+      {n:"嬰兒式（廣角）",s:"40秒",brief:"放鬆背部",
+        muscles:["背闊肌","脊椎伸肌","髖屈肌"],
+        cues:["🐾 跪姿，雙膝打開略寬於肩","🙌 臀部往後坐向腳跟，雙手向前爬行","😌 額頭放鬆貼地，感覺整個背部被拉長"],
+        avoid:"若膝蓋不適可墊毯子"},
+      {n:"仰躺膝蓋抱胸",s:"30秒",brief:"放鬆腰椎",
+        muscles:["腰椎伸肌","臀大肌"],
+        cues:["🛌 仰躺，雙手環抱膝蓋向胸口靠近","🌀 輕輕左右搖擺做按摩","😮‍💨 深呼吸放鬆腰部"],
+        avoid:"頸部放鬆貼地；動作輕柔"},
+    ]}
+  ]},
+  5:{title:"全身 HIIT",sub:"心肺 · 燃脂 · 全身",e:"🔥",m:30,s:[
+    {t:"w",l:"熱身",d:"5 min",exs:[
+      {n:"慢跑原地",s:"60秒",brief:"提升心率",
+        muscles:["心肺","小腿","股四頭肌"],
+        cues:["🏃 原地慢跑，腳跟輕輕著地","💨 手臂配合擺動","🎯 節奏輕鬆，讓身體慢慢暖起來"],
+        avoid:"不要踮腳尖跑（長時間容易小腿緊繃）"},
+      {n:"開合跳",s:"45秒",brief:"全身動態熱身",
+        muscles:["三角肌","臀中肌","心肺"],
+        cues:["👐 雙腳跳開同時雙手舉過頭頂","🙏 跳回同時雙手放回身側","🎵 保持有節奏的節拍"],
+        avoid:"膝蓋微彎落地，不要膝蓋鎖死著地"},
+      {n:"動態弓步＋手臂擺動",s:"×10每腳",brief:"活化全身",
+        muscles:["髖屈肌","股四頭肌","臀大肌"],
+        cues:["🚶 大步向前弓步，同時雙臂一前一後擺動","⬆️ 站起換腳","🎯 動作有韻律感，配合呼吸"],
+        avoid:"身體保持直立，不要過度前傾"},
+      {n:"手臂繞環＋腰部旋轉",s:"30秒",brief:"活動肩膀腰椎",
+        muscles:["肩關節","胸椎"],
+        cues:["🔄 雙臂向前大繞環10次，再向後10次","🌀 接著雙手叉腰，腰部向左右各大幅旋轉5次"],
+        avoid:"動作要慢，感覺關節活動，不要甩動"},
+    ]},
+    {t:"h",l:"HIIT 主訓練",d:"3輪",note:"每動作 40秒做 / 20秒休息，完成一輪休息90秒",exs:[
+      {n:"跳躍深蹲",s:"40s/20s",brief:"下肢爆發力",
+        muscles:["股四頭肌","臀大肌","心肺"],
+        cues:["🏋️ 先蹲至大腿平行地面","💥 爆發向上跳起，手臂輔助擺動","🦶 落地時膝蓋微彎吸收衝擊，立刻進入下一次"],
+        avoid:"落地時膝蓋不要向內扣；若關節不適改成快速深蹲不跳"},
+      {n:"伏地挺身",s:"40s/20s",brief:"上肢推力耐力",
+        muscles:["胸大肌","三頭肌","三角肌前束"],
+        cues:["💪 維持標準伏地挺身姿勢","⚡ 在40秒內盡可能完成更多次","🛐 若撐不住可改跪姿版本"],
+        avoid:"品質比數量重要；感覺姿勢崩壞就改跪姿"},
+      {n:"弓步跳",s:"40s/20s",brief:"下肢爆發力＋協調",
+        muscles:["股四頭肌","臀大肌","腿後腱肌群","心肺"],
+        cues:["🦵 弓步站立姿勢開始","💥 跳起同時雙腳互換前後位置","🦶 落地立刻下蹲進入下一次弓步"],
+        avoid:"若膝蓋不適改成慢速弓步交替；落地要輕"},
+      {n:"登山者式",s:"40s/20s",brief:"核心＋心肺",
+        muscles:["腹直肌","髖屈肌","肩關節穩定肌","心肺"],
+        cues:["💪 平板支撐手掌撐地","🏃 雙腳快速交替向胸口收","🔒 臀部不要抬高，核心全程收緊"],
+        avoid:"臀部不要高過肩膀；手腕不適可改手肘支撐"},
+      {n:"波比跳",s:"40s/20s",brief:"全身爆發耐力",
+        muscles:["全身肌群","心肺"],
+        cues:["🏃 站立→雙手撐地→雙腳向後跳成平板→伏地挺身（可省略）→雙腳跳回→跳起拍手","💡 每個動作都完整做，不要偷工減料","⚡ 速度量力而為，品質優先"],
+        avoid:"若心率過高可省略最後的跳起；腰部要全程收緊"},
+      {n:"高抬腿",s:"40s/20s",brief:"心肺衝刺",
+        muscles:["髖屈肌","心肺","核心"],
+        cues:["🏃 原地跑步，膝蓋盡量抬至腰部高度","💨 手臂大幅擺動配合","🎵 盡量維持高速且高抬腿"],
+        avoid:"腳掌輕輕落地，不要用腳跟重踩"},
+    ]},
+    {t:"c",l:"收操伸展",d:"5 min",exs:[
+      {n:"慢步走降心率",s:"2分鐘",brief:"降低心率",
+        muscles:["心肺"],
+        cues:["🚶 原地或繞房間慢步走","😮‍💨 深呼吸，讓心率逐漸降低","🚫 絕對不要訓練後立刻坐下或躺下"],
+        avoid:"HIIT後立刻停止容易頭暈；至少走2分鐘再伸展"},
+      {n:"站姿體前彎",s:"40秒",brief:"伸展腿後側＋背部",
+        muscles:["腿後腱肌群","豎脊肌"],
+        cues:["🧍 雙腿伸直（或膝蓋微彎），上身從髖部慢慢向下","🙌 雙手自然下垂，讓重力帶動伸展","😮‍💨 每次吐氣身體再往下多一點點"],
+        avoid:"不要強迫低頭彎腰，從髖部折疊"},
+      {n:"低弓步髖屈肌伸展",s:"35秒×每側",brief:"伸展髖屈肌",
+        muscles:["髂腰肌","股直肌"],
+        cues:["🧎 一腳弓步，後腳膝蓋跪地","⬆️ 上身直立，重心略前移","😌 感覺後腳髖關節前方被拉開"],
+        avoid:"前腳膝蓋不超過腳尖太多；腰部不要過度後仰"},
+      {n:"股四頭肌伸展（扶牆）🧱",s:"30秒×每腳",brief:"伸展大腿前側",
+        muscles:["股四頭肌","髖屈肌"],
+        cues:["🧱 扶牆站立，單腳後勾握腳踝","🦵 膝蓋保持併攏，感受大腿前側伸展","😮‍💨 深呼吸維持"],
+        avoid:"不要讓身體前傾代償"},
+      {n:"胸肌牆角伸展 🧱",s:"30秒×2",brief:"放鬆胸肌",
+        muscles:["胸大肌","三角肌前束"],
+        cues:["🧱 面對牆角，手肘彎曲90°抵牆","🚶 身體向前靠，感覺胸肌伸展","😮‍💨 深呼吸放鬆"],
+        avoid:"不要頸部前傾代償"},
+      {n:"仰躺全身伸展",s:"40秒",brief:"放鬆全身",
+        muscles:["全身"],
+        cues:["🛌 仰躺，雙手舉過頭頂伸直","🦵 雙腿向遠端延伸","🌊 感覺從指尖到腳尖被拉長","😮‍💨 深呼吸，讓身體完全放鬆"],
+        avoid:"頸部保持中立，不要過度後仰"},
+    ]}
+  ]}
+};
+
+// ─────────────── AURA'S WORKOUT DATA ───────────────
+// 新手增肌塑形，一週四天，重點臀腿核心
+const WD_AURA={
+  1:{title:"上肢基礎",sub:"胸 · 肩 · 三頭（新手版）",e:"💪",m:30,s:[
+    {t:"w",l:"熱身",d:"5 min",exs:[
+      {n:"手臂大繞環",s:"×12圈",brief:"活動肩關節",
+        muscles:["肩關節","旋轉肌群"],
+        cues:["🔄 雙手平舉，手掌朝下","⭕ 向前繞大圈12次，向後再12次","😮‍💨 動作幅度越大越好，不要聳肩"],
+        avoid:"避免聳肩代償"},
+      {n:"貓牛式",s:"×10次",brief:"暖身脊椎",
+        muscles:["脊椎伸肌","腹肌"],
+        cues:["🐄 吸氣：腹部下沉，頭尾抬起（牛式）","🐱 吐氣：拱背，下巴收（貓式）","⏱ 每個動作停頓1秒"],
+        avoid:"腰部不要過度塌陷"},
+      {n:"跪姿伏地挺身（熱身）",s:"×8次",brief:"喚醒胸肌",
+        muscles:["胸大肌","三角肌前束","三頭肌"],
+        cues:["🙏 膝蓋著地，身體保持一直線","👐 雙手略寬於肩膀","⬇️ 胸口緩降至地面","⬆️ 推回，不鎖死手肘"],
+        avoid:"臀部不要翹高或下沉"},
+    ]},
+    {t:"m",l:"主訓練",d:"",exs:[
+      {n:"跪姿伏地挺身",s:"3×12",brief:"胸肌入門動作",
+        muscles:["胸大肌","三角肌前束","三頭肌"],
+        cues:["🙏 膝蓋著地，髖部不翹起，身體一直線","👐 手寬於肩，手指朝前","⬇️ 胸口降至手背高度","⬆️ 推起時呼氣"],
+        avoid:"臀部不要翹高；不要塌腰"},
+      {n:"牆壁伏地挺身 🧱",s:"2×15",brief:"肩膀入門",
+        muscles:["三角肌前束","胸大肌","三頭肌"],
+        cues:["🧱 面對牆壁站立，雙手撐牆與肩同高","⬇️ 身體向前傾，胸口靠近牆壁","⬆️ 推回起始位置","📏 身體保持一直線"],
+        avoid:"不要低頭；核心保持收緊"},
+      {n:"椅子撐體 Dips 🪑",s:"2×10",brief:"三頭基礎",
+        muscles:["三頭肌","三角肌後束"],
+        cues:["🪑 雙手撐椅緣，膝蓋彎曲腳踩地（較易版本）","⬇️ 身體下沉，手肘彎至90°","⬆️ 三頭肌推回","📏 背部靠近椅子"],
+        avoid:"肩膀不要聳起；身體不要過度前傾"},
+      {n:"超人式",s:"3×12",brief:"強化下背",
+        muscles:["豎脊肌","臀大肌"],
+        cues:["🤸 俯臥，手臂向前伸直","⬆️ 同時抬起雙臂與雙腿，離地約10cm","⏱ 頂端停頓2秒","⬇️ 緩慢放回"],
+        avoid:"頸部不要過度後仰"},
+    ]},
+    {t:"c",l:"收操伸展",d:"5 min",exs:[
+      {n:"胸肌牆角伸展 🧱",s:"30秒×2",brief:"伸展胸肌",
+        muscles:["胸大肌","三角肌前束"],
+        cues:["🧱 面對牆角，手肘彎曲90°貼牆","🚶 身體緩慢向前，感覺胸肌被拉開","😮‍💨 深呼吸維持30秒"],
+        avoid:"感到疼痛立刻停止"},
+      {n:"三頭肌過頭伸展",s:"30秒×每側",brief:"伸展三頭",
+        muscles:["三頭肌"],
+        cues:["💪 一手舉過頭，手肘彎曲","🤝 另一手輕壓手肘","😌 感覺上臂後側伸展"],
+        avoid:"不要拉扯過猛"},
+      {n:"嬰兒式",s:"40秒",brief:"放鬆肩背",
+        muscles:["背闊肌","脊椎伸肌"],
+        cues:["🐾 跪坐，臀部往後坐向腳跟","🙌 雙手向前伸直，額頭放鬆貼地","😮‍💨 每次呼氣讓身體更下沉"],
+        avoid:"膝蓋不適可墊枕頭"},
+    ]}
+  ]},
+  2:{title:"臀腿核心",sub:"臀部 · 大腿 · 核心（重點）",e:"🍑",m:30,s:[
+    {t:"w",l:"熱身",d:"5 min",exs:[
+      {n:"髖關節繞環",s:"×10每腳",brief:"活動髖關節",
+        muscles:["髖屈肌","臀中肌"],
+        cues:["🦵 站立，單腳抬起膝蓋","⭕ 向外旋轉大圓圈10次，再向內10次","✋ 扶牆保持平衡"],
+        avoid:"支撐腳膝蓋微彎不要鎖死"},
+      {n:"原地弓步走",s:"×8每腳",brief:"拉開髖屈肌",
+        muscles:["髖屈肌","臀大肌","股四頭肌"],
+        cues:["🚶 大步向前踏出，前腳膝蓋彎約90°","⬆️ 前腳踩地站起，換腳","🎯 上身保持直立"],
+        avoid:"前腳膝蓋不超過腳趾太多"},
+      {n:"開合跳",s:"30秒",brief:"全身熱身",
+        muscles:["心肺","臀中肌"],
+        cues:["👐 雙腳跳開同時雙手舉過頭頂","🙏 跳回同時雙手放回身側","🎵 保持節奏"],
+        avoid:"膝蓋微彎落地，不要鎖死"},
+    ]},
+    {t:"m",l:"主訓練",d:"",exs:[
+      {n:"深蹲",s:"3×15",brief:"下肢基礎動作",
+        muscles:["股四頭肌","臀大肌","腿後腱肌群"],
+        cues:["👣 雙腳與肩同寬，腳尖略外轉","⬇️ 臀部往後往下坐，大腿盡量平行地面","🦵 膝蓋對齊腳趾（不要內扣）","⬆️ 起身夾臀"],
+        avoid:"膝蓋不要向內塌陷；腳跟不要離地"},
+      {n:"臀橋",s:"4×15",brief:"主攻臀大肌",
+        muscles:["臀大肌","腿後腱肌群"],
+        cues:["🛌 仰躺，膝蓋彎曲踩地","⬆️ 臀部抬起至身體成一直線","🍑 頂端夾緊臀部停頓2秒","⬇️ 緩緩放回，不完全碰地"],
+        avoid:"腰部不要過度拱起代償"},
+      {n:"側臥髖外展",s:"3×15每側",brief:"臀中肌塑形",
+        muscles:["臀中肌","臀小肌"],
+        cues:["🛌 側臥，身體成一直線","⬆️ 上方腿向上抬起約45°，腳尖朝前","⏱ 頂端停頓1秒","⬇️ 緩慢放回"],
+        avoid:"骨盆不要前傾；腳尖不要朝天"},
+      {n:"跪姿後抬腿",s:"3×12每側",brief:"臀部塑形",
+        muscles:["臀大肌","腿後腱肌群"],
+        cues:["🐾 四足跪姿，手腕在肩下，膝蓋在髖下","⬆️ 一腳膝蓋彎曲，腳跟向天花板踢","🍑 頂端夾臀停頓1秒","⬇️ 緩慢放回，不碰地"],
+        avoid:"腰部不要過度後仰代償；核心收緊"},
+      {n:"捲腹",s:"3×15",brief:"腹直肌基礎",
+        muscles:["腹直肌","腹外斜肌"],
+        cues:["🛌 仰躺，膝蓋彎曲踩地","🤲 雙手放大腿上或輕扶頭後（不拉頸）","⬆️ 腹肌出力，上背離地至肩胛骨下緣","⏱ 頂端停頓1秒，緩慢放回"],
+        avoid:"不要用手拉頸部；腰部始終貼地"},
+    ]},
+    {t:"c",l:"收操伸展",d:"5 min",exs:[
+      {n:"股四頭肌伸展（扶牆）🧱",s:"35秒×每腳",brief:"伸展大腿前側",
+        muscles:["股四頭肌"],
+        cues:["🧱 扶牆站立，單腳後勾握腳踝","🦵 膝蓋保持併攏","😮‍💨 深呼吸維持"],
+        avoid:"不要讓身體前傾代償"},
+      {n:"臀部鴿式伸展",s:"40秒×每側",brief:"伸展梨狀肌",
+        muscles:["梨狀肌","臀大肌"],
+        cues:["🛌 仰躺，一腳外踝搭在另一腳大腿上","🤗 雙手環抱後側大腿向胸口拉","😌 感覺臀部深層伸展"],
+        avoid:"頸部放鬆貼地"},
+      {n:"坐姿腿後側伸展",s:"35秒×2",brief:"伸展腿後腱",
+        muscles:["腿後腱肌群"],
+        cues:["🧘 坐地雙腿伸直","🙏 上身從髖部前傾，背部盡量平直","😮‍💨 每次吐氣更往前"],
+        avoid:"不要刻意彎腰駝背"},
+    ]}
+  ]},
+  4:{title:"全身循環",sub:"核心 · 臀腿 · 有氧",e:"🔥",m:30,s:[
+    {t:"w",l:"熱身",d:"5 min",exs:[
+      {n:"慢跑原地",s:"60秒",brief:"提升心率",
+        muscles:["心肺","小腿"],
+        cues:["🏃 原地慢跑，腳跟輕輕著地","💨 手臂配合擺動"],
+        avoid:"不要踮腳尖跑"},
+      {n:"開合跳",s:"30秒",brief:"全身熱身",
+        muscles:["心肺","臀中肌"],
+        cues:["👐 跳開同時舉手","🙏 跳回同時放手"],
+        avoid:"膝蓋微彎落地"},
+      {n:"動態弓步",s:"×8每腳",brief:"活化下肢",
+        muscles:["髖屈肌","股四頭肌"],
+        cues:["🚶 輕鬆節奏弓步走","🎯 上身保持直立"],
+        avoid:"不要過度前傾"},
+    ]},
+    {t:"h",l:"有氧循環",d:"3輪",note:"每動作 30秒做 / 15秒休息，比 Jay 版本節奏稍慢",exs:[
+      {n:"深蹲",s:"30s/15s",brief:"下肢基礎",
+        muscles:["股四頭肌","臀大肌"],
+        cues:["🏋️ 標準深蹲姿勢","⚡ 穩定節奏，不求快"],
+        avoid:"膝蓋不要內扣"},
+      {n:"跪姿伏地挺身",s:"30s/15s",brief:"上肢推力",
+        muscles:["胸大肌","三頭肌"],
+        cues:["💪 膝蓋著地版伏地挺身","⚡ 30秒內完成盡可能多次"],
+        avoid:"姿勢崩壞就休息"},
+      {n:"臀橋",s:"30s/15s",brief:"臀部啟動",
+        muscles:["臀大肌"],
+        cues:["🛌 快速臀橋，節奏穩定","🍑 每次頂端夾臀"],
+        avoid:"腰部不要代償"},
+      {n:"登山者式",s:"30s/15s",brief:"核心＋心肺",
+        muscles:["核心","心肺"],
+        cues:["💪 平板支撐，雙腳交替向胸口收","🔒 臀部不要抬高"],
+        avoid:"腰部不要塌陷"},
+      {n:"側臥髖外展",s:"30s/15s",brief:"臀中肌",
+        muscles:["臀中肌"],
+        cues:["🛌 側臥，上方腿向上抬","⏱ 快速但有控制"],
+        avoid:"骨盆不要前傾"},
+      {n:"高抬腿（慢速）",s:"30s/15s",brief:"心肺有氧",
+        muscles:["心肺","髖屈肌"],
+        cues:["🏃 原地抬腿，膝蓋盡量到腰部高度","💨 手臂配合擺動"],
+        avoid:"腳跟輕落地"},
+    ]},
+    {t:"c",l:"收操伸展",d:"5 min",exs:[
+      {n:"慢步走降心率",s:"2分鐘",brief:"降低心率",
+        muscles:["心肺"],
+        cues:["🚶 原地慢走","😮‍💨 深呼吸","🚫 不要立刻坐下"],
+        avoid:"HIIT後立刻停止容易頭暈"},
+      {n:"低弓步髖屈肌伸展",s:"35秒×每側",brief:"伸展髖屈肌",
+        muscles:["髂腰肌"],
+        cues:["🧎 弓步跪地，重心前移","😌 感覺後腳髖前方伸展"],
+        avoid:"腰部不要過度後仰"},
+      {n:"仰躺全身伸展",s:"40秒",brief:"放鬆全身",
+        muscles:["全身"],
+        cues:["🛌 仰躺，雙手舉過頭頂","🌊 從指尖到腳尖盡力拉長","😮‍💨 深呼吸放鬆"],
+        avoid:"頸部保持中立"},
+    ]}
+  ]},
+  5:{title:"背部核心",sub:"背部 · 核心 · 臀部",e:"🏋️",m:30,s:[
+    {t:"w",l:"熱身",d:"5 min",exs:[
+      {n:"貓牛式",s:"×12次",brief:"暖身脊椎",
+        muscles:["脊椎伸肌","腹肌"],
+        cues:["🐄 吸氣塌背（牛式）","🐱 吐氣拱背（貓式）","⏱ 每個動作停頓1秒"],
+        avoid:"腰部不要過度塌陷"},
+      {n:"肩胛骨後縮練習",s:"×12次",brief:"啟動肩胛",
+        muscles:["菱形肌","斜方肌"],
+        cues:["🧍 站立，雙臂放鬆","🔙 肩胛骨向中間夾緊，停頓2秒","↩️ 緩慢放鬆"],
+        avoid:"不要聳肩"},
+      {n:"死蟲式（核心啟動）",s:"×6每側",brief:"啟動深層核心",
+        muscles:["腹橫肌","多裂肌"],
+        cues:["🛌 仰躺，雙臂朝天，膝蓋90°抬起","😮‍💨 呼氣讓腰部完全貼地","⬇️ 右臂向後、左腳向前同時伸直（不碰地）","⬆️ 緩慢回復換邊"],
+        avoid:"腰部離地即停；不要憋氣"},
+    ]},
+    {t:"m",l:"主訓練",d:"",exs:[
+      {n:"桌下仰臥划船 🛏️",s:"3×8",brief:"入門練背動作",
+        muscles:["背闊肌","菱形肌","二頭肌"],
+        cues:["🛏️ 躺在床下，雙手抓床架","📏 手臂伸直，身體成一直線","⬆️ 胸口拉向橫桿，手肘靠近身側","⬇️ 緩慢放回"],
+        avoid:"臀部不要下垂；用背部出力不是手臂"},
+      {n:"平板支撐",s:"3×20秒",brief:"核心基礎",
+        muscles:["腹橫肌","腹直肌","核心"],
+        cues:["💪 手肘在肩下，前臂撐地","📏 身體一直線","🔒 收緊腹部","😮‍💨 正常呼吸"],
+        avoid:"臀部不要翹高或下沉"},
+      {n:"鳥狗式",s:"3×8每側",brief:"核心穩定",
+        muscles:["多裂肌","腹橫肌","臀大肌"],
+        cues:["🐾 四足跪姿","⬆️ 右臂前伸，左腿後伸","⏱ 頂端停頓2秒，換邊"],
+        avoid:"腰椎不要旋轉；動作要慢"},
+      {n:"臀橋",s:"3×15",brief:"臀部強化",
+        muscles:["臀大肌","腿後腱肌群"],
+        cues:["🛌 仰躺，膝蓋彎曲踩地","⬆️ 抬起臀部至身體一直線","🍑 頂端夾臀停頓2秒"],
+        avoid:"腰部不要過度拱起"},
+      {n:"側平板支撐",s:"2×20秒每側",brief:"側腹強化",
+        muscles:["腹外斜肌","腹內斜肌","臀中肌"],
+        cues:["💪 側臥，手肘在肩下","⬆️ 臀部抬離地面，身體成一直線","😮‍💨 正常呼吸維持20秒"],
+        avoid:"髖部不要前後偏移"},
+    ]},
+    {t:"c",l:"收操伸展",d:"5 min",exs:[
+      {n:"嬰兒式（廣角）",s:"40秒",brief:"放鬆背部",
+        muscles:["背闊肌","脊椎伸肌"],
+        cues:["🐾 跪姿，雙膝打開略寬於肩","🙌 臀部往後坐，雙手向前爬","😌 額頭放鬆貼地"],
+        avoid:"膝蓋不適可墊毯子"},
+      {n:"仰躺膝蓋抱胸",s:"30秒",brief:"放鬆腰椎",
+        muscles:["腰椎伸肌"],
+        cues:["🛌 仰躺，雙手環抱膝蓋靠胸","🌀 輕輕左右搖擺","😮‍💨 深呼吸放鬆"],
+        avoid:"動作輕柔"},
+      {n:"仰躺脊椎扭轉",s:"30秒×每側",brief:"放鬆腰椎",
+        muscles:["腰方肌","梨狀肌"],
+        cues:["🛌 仰躺，雙臂展開","🦵 一腳膝蓋橫倒向對側","👀 頭轉向反方向","😮‍💨 深呼吸放鬆"],
+        avoid:"肩膀盡量貼地"},
+    ]}
+  ]}
+};
+
+// ─────────────── USER SYSTEM ───────────────
+const USERS={
+  yinjie:{name:"Jay",emoji:"🐬",color:"#4ecdc4",WD:null},
+  aura:{name:"Aurola",emoji:"🦥",color:"#ff8fab",WD:WD_AURA}
+};
+
+const SCHED={0:null,1:1,2:2,3:null,4:4,5:5,6:null};
+const BMAP={w:"bw",m:"bm",h:"bh",c:"bc"};
+let currentUser="yinjie";
+let WD=null;
+let activeDay, checks={}, completed={}, expanded={}, setProgress={};
+let history={};
+
+const todayDOW=new Date().getDay(); // must be before initUser
+
+function initUser(){
+  USERS.yinjie.WD=WD_YINJIE;
+  WD=USERS[currentUser].WD;
+  const prefix=currentUser+"_";
+  try{completed=JSON.parse(localStorage.getItem(prefix+"wk_done")||"{}");}catch{}
+  try{history=JSON.parse(localStorage.getItem(prefix+"wk_history")||"{}");}catch{}
+  checks={};expanded={};setProgress={};
+  // Default to today's workout if today is a training day, else first training day
+  activeDay=SCHED[todayDOW]||1;
+  assessedToday=false;
+  const btn=document.getElementById("userSwitchBtn");
+  const u=USERS[currentUser];
+  btn.innerHTML=`<span>${u.emoji}</span><span>${u.name}</span><span style="opacity:.4;font-size:9px">⇄</span>`;
+  btn.className="user-switch-btn "+currentUser;
+  renderWeek();renderTabs();renderWorkout();
+}
+
+function switchUser(){
+  currentUser=currentUser==="yinjie"?"aura":"yinjie";
+  initUser();
+}
+
+function saveHistory(){
+  try{localStorage.setItem(currentUser+"_wk_history",JSON.stringify(history));}catch{}
+}
+
+function markDone(){
+  const all=getKeys();
+  if(all.filter(k=>checks[k]).length<all.length)return;
+  const dk=new Date().toISOString().split("T")[0];
+  completed[dk]=activeDay;
+  const exProgress={};
+  all.forEach(k=>{exProgress[k]=setProgress[k]||1;});
+  history[dk]={dayKey:activeDay,exProgress};
+  saveHistory();
+  try{localStorage.setItem(currentUser+"_wk_done",JSON.stringify(completed));}catch{}
+  renderWeek();
+}
+
+// ─────────────── WEEK / DATES ───────────────
+function weekDates(){
+  const now=new Date(),dow=now.getDay();
+  return Array.from({length:7},(_,i)=>{const d=new Date(now);d.setDate(now.getDate()-dow+i);return d;});
+}
+
+function renderWeek(){
+  const dates=weekDates();
+  document.getElementById("weekGrid").innerHTML=dates.map((d,i)=>{
+    const dk=d.toISOString().split("T")[0];
+    const done=completed[dk];
+    const isToday=i===todayDOW;
+    const wdKey=SCHED[i]; // workout day key for this weekday
+    const hasWorkout=wdKey!==null;
+    const isSelected=hasWorkout&&activeDay==wdKey;
+    const classes=["wday",isToday?"today":"",hasWorkout?"has-workout":"rest-day",isSelected?"selected-week":""].filter(Boolean).join(" ");
+    const onclick=hasWorkout?`switchDay(${wdKey})`:"";
+    return`<div class="${classes}" ${onclick?`onclick="${onclick}"`:""}">
+      <div class="wday-label">${["日","一","二","三","四","五","六"][i]}</div>
+      <div class="wday-date">${d.getDate()}</div>
+      ${done?'<div class="wday-dot"></div>':hasWorkout&&!isToday?'<div class="wday-pip"></div>':""}
+    </div>`;
+  }).join("");
+}
+
+function renderTabs(){
+  document.getElementById("dayTabs").innerHTML=Object.entries(WD).map(([k,w])=>
+    `<button class="day-tab${activeDay==k?" active":""}" onclick="switchDay(${k})">${w.e} ${w.title}</button>`
+  ).join("");
+}
+
+// ─────────────── EXERCISE RENDERING ───────────────
+function getKeys(){
+  const w=WD[activeDay],keys=[];
+  w.s.forEach((sec,si)=>sec.exs.forEach((_,ei)=>keys.push(`${activeDay}-${si}-${ei}`)));
+  return keys;
+}
+
+// Parse total sets from sets string: "3×10" → 3, "4×15" → 4, "×15圈" → 1, "30秒×2" → 2, "30秒×每側" → 2, "40秒" → 1, "2分鐘" → 1
+function parseTotalSets(setsStr){
+  // "N×每側" or "N×每腳" → treat as 2 (left + right)
+  if(/×每側|×每腳/.test(setsStr)){
+    const m=setsStr.match(/(\d+)/);
+    return m?2:2;
+  }
+  // "4×12" → 4
+  const frontMatch=setsStr.match(/^(\d+)×/);
+  if(frontMatch)return parseInt(frontMatch[1]);
+  // "×15圈" or "×10次" → 1 (single set)
+  if(setsStr.startsWith("×"))return 1;
+  // time-based single sets
+  return 1;
+}
+
+function renderWorkout(){
+  const w=WD[activeDay];
+  const all=getKeys(),done=all.filter(k=>checks[k]).length,total=all.length;
+  const pct=total>0?Math.round(done/total*100):0;
+  let html=`<div class="workout-hdr">
+    <div class="workout-title-row">
+      <div><div class="workout-name">${w.e} ${w.title}</div><div class="workout-sub">${w.sub}</div></div>
+      <div><div class="workout-mins-num">${w.m}</div><div class="workout-mins-label">MIN</div></div>
+    </div>
+    <div class="prog-wrap"><div class="prog-bar" style="width:${pct}%"></div></div>
+    <div class="prog-label"><span>進度</span><span>${done}/${total}</span></div>
+  </div>`;
+
+  w.s.forEach((sec,si)=>{
+    const isHIIT=sec.t==="h";
+    html+=`<div class="section-hdr">
+      <div class="section-hdr-left">
+        <span class="s-badge ${BMAP[sec.t]}">${sec.l}</span>
+        ${sec.d?`<span class="s-time">${sec.d}</span>`:""}
+      </div>
+      ${isHIIT?`<button class="hiit-timer-btn" onclick="openHiit(${si})">▶ HIIT 計時器</button>`:""}
+      ${sec.note?`<div class="s-note">${sec.note}</div>`:""}
+    </div>`;
+
+    sec.exs.forEach((ex,ei)=>{
+      const key=`${activeDay}-${si}-${ei}`;
+      const ck=checks[key],isOpen=expanded[key];
+      const totalSets=parseTotalSets(ex.s);
+      const doneSets=setProgress[key]||0;
+      const isHIITsec=sec.t==="h";
+
+      // Build pip dots for set counter
+      let pipsHtml="";
+      if(!isHIITsec&&totalSets>1){
+        pipsHtml=Array.from({length:totalSets},(_,i)=>{
+          const pipClass=i<doneSets?(i===totalSets-1&&doneSets===totalSets?"set-pip done-last":"set-pip done"):"set-pip";
+          return`<div class="${pipClass}"></div>`;
+        }).join("");
+      }
+      const counterLabel=totalSets>1?(ck?`<span class="set-counter-label full">✓</span>`:`<span class="set-counter-label${doneSets===totalSets?" full":""}">${doneSets}/${totalSets}</span>`):"";
+
+      html+=`<div class="ex-row${ck?" chk":""}" id="exrow-${key}">
+        <div class="ex-row-main">
+          <div class="ex-chk${ck?" on":""}" onclick="toggleExpand('${key}')"></div>
+          <div class="ex-info" onclick="toggleExpand('${key}')">
+            <div class="ex-name">${ex.n} <span class="ex-expand-icon${isOpen?" open":""}">▾</span></div>
+            ${ex.brief?`<div class="ex-brief">${ex.brief}</div>`:""}
+          </div>
+          <div class="ex-sets-col">
+            <div class="ex-sets">${ex.s}</div>
+            ${totalSets>1&&!isHIITsec?`<div class="set-counter" onclick="addSet('${key}','${sec.t}',${totalSets})" onmousedown="startLongPress('${key}',${totalSets})" ontouchstart="startLongPress('${key}',${totalSets})" onmouseup="cancelLongPress()" ontouchend="cancelLongPress()" onmouseleave="cancelLongPress()">
+              <div class="set-counter-track">${pipsHtml}</div>
+              ${counterLabel}
+            </div>`:`<div class="set-counter" onclick="addSet('${key}','${sec.t}',${totalSets})" onmousedown="startLongPress('${key}',${totalSets})" ontouchstart="startLongPress('${key}',${totalSets})" onmouseup="cancelLongPress()" ontouchend="cancelLongPress()" style="justify-content:flex-end">
+              ${ck?`<span class="set-counter-label full">✓</span>`:`<span class="set-counter-label" style="color:var(--muted)">點擊完成</span>`}
+            </div>`}
+          </div>
+        </div>
+        <div class="ex-detail${isOpen?" open":""}" id="detail-${key}">
+          <div class="ex-detail-inner">
+            ${ex.muscles?`<div class="ex-d-section"><div class="ex-d-label">主要肌群</div><div class="ex-d-muscles">${ex.muscles.map(m=>`<span class="ex-d-muscle">${m}</span>`).join("")}</div></div>`:""}
+            ${ex.cues?`<div class="ex-d-section"><div class="ex-d-label">動作要點</div><div class="ex-d-cues">${ex.cues.map(c=>{const parts=c.split(" ");const icon=parts[0];const text=parts.slice(1).join(" ");return`<div class="ex-d-cue"><span class="ex-d-cue-icon">${icon}</span><span>${text}</span></div>`;}).join("")}</div></div>`:""}
+            ${ex.avoid?`<div class="ex-d-avoid">⚠️ <span>${ex.avoid}</span></div>`:""}
+          </div>
+        </div>
+      </div>`;
+    });
+  });
+
+  document.getElementById("workoutContent").innerHTML=html;
+  updateBtn();
+}
+
+function toggleExpand(key){
+  expanded[key]=!expanded[key];
+  const row=document.getElementById(`exrow-${key}`);
+  const detail=document.getElementById(`detail-${key}`);
+  const icon=row.querySelector(".ex-expand-icon");
+  if(expanded[key]){detail.classList.add("open");icon.classList.add("open");}
+  else{detail.classList.remove("open");icon.classList.remove("open");}
+}
+
+// ─────────────── BODY ASSESSMENT ───────────────
+let todayAssessScore=0;
+let assessedToday=false;
+
+function openAssessment(){
+  document.getElementById("assessOverlay").style.display="flex";
+  document.querySelectorAll(".assess-opt").forEach(b=>b.classList.remove("sel"));
+}
+
+function closeAssessment(){
+  // Can't close without selecting — force a choice
+  document.getElementById("assessOverlay").style.display="none";
+}
+
+function selectAssess(score){
+  todayAssessScore=score;
+  assessedToday=true;
+  document.querySelectorAll(".assess-opt").forEach((b,i)=>{
+    b.classList.toggle("sel",i===score-1);
+  });
+  setTimeout(()=>{
+    closeAssessment();
+    showAssessFeedback(score);
+  },400);
+}
+
+function showAssessFeedback(score){
+  const msgs={
+    1:"今天好好休息 💤 建議只做熱身和收操",
+    2:"狀態不好，輕鬆訓練，不要強迫自己",
+    3:"正常發揮就好 💪",
+    4:"狀態不錯！可以嘗試多加半組",
+    5:"今天狀態超好！全力以赴 🔥 可以多加一組！"
+  };
+  const colors={1:"#888",2:"#ffb347",3:"#d4ff4e",4:"#97C459",5:"#ff6b35"};
+  const toast=document.createElement("div");
+  toast.style.cssText=`position:fixed;top:80px;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid ${colors[score]};border-radius:10px;padding:12px 20px;font-size:13px;color:${colors[score]};font-family:'Noto Sans TC',sans-serif;z-index:500;max-width:320px;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,.5)`;
+  toast.textContent=msgs[score];
+  document.body.appendChild(toast);
+  setTimeout(()=>toast.remove(),3000);
+}
+
+// ─────────────── 3-2-1 COUNTDOWN ───────────────
+let cdInterval=null;
+let cdCallback=null;
+
+function startCountdown(exName, callback){
+  cdCallback=callback;
+  let count=3;
+  document.getElementById("cdExName").textContent=exName;
+  const numEl=document.getElementById("cdNum");
+  numEl.textContent="3";
+  numEl.className="";
+  document.getElementById("countdownOverlay").style.display="flex";
+
+  playSound("tick");
+
+  cdInterval=setInterval(()=>{
+    count--;
+    if(count>0){
+      numEl.textContent=count;
+      numEl.className="";
+      playSound("tick");
+    } else {
+      numEl.textContent="GO!";
+      numEl.className="go";
+      playSound("go");
+      setTimeout(()=>{
+        document.getElementById("countdownOverlay").style.display="none";
+        clearInterval(cdInterval);
+        if(cdCallback)cdCallback();
+      },600);
+    }
+  },1000);
+}
+const AudioCtx=window.AudioContext||window.webkitAudioContext;
+let audioCtx=null;
+function getAudioCtx(){if(!audioCtx)audioCtx=new AudioCtx();return audioCtx;}
+
+function playSound(type){
+  try{
+    const ctx=getAudioCtx();
+    const o=ctx.createOscillator();
+    const g=ctx.createGain();
+    o.connect(g);g.connect(ctx.destination);
+    if(type==="rest"){
+      // Two-tone "ding ding" — rest starting
+      o.frequency.setValueAtTime(880,ctx.currentTime);
+      o.frequency.setValueAtTime(1100,ctx.currentTime+0.12);
+      g.gain.setValueAtTime(0.3,ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.35);
+      o.start(ctx.currentTime);o.stop(ctx.currentTime+0.35);
+    } else if(type==="go"){
+      // Rising "go!" tone — time to move
+      o.frequency.setValueAtTime(660,ctx.currentTime);
+      o.frequency.linearRampToValueAtTime(1320,ctx.currentTime+0.15);
+      g.gain.setValueAtTime(0.35,ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.4);
+      o.start(ctx.currentTime);o.stop(ctx.currentTime+0.4);
+    } else if(type==="tick"){
+      // Soft tick for last 5 seconds
+      o.frequency.setValueAtTime(1000,ctx.currentTime);
+      g.gain.setValueAtTime(0.15,ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.08);
+      o.start(ctx.currentTime);o.stop(ctx.currentTime+0.08);
+    }
+  }catch(e){}
+}
+
+// ─────────────── LONG PRESS TO UNDO SET ───────────────
+let longPressTimer=null;
+function startLongPress(key,totalSets){
+  longPressTimer=setTimeout(()=>{
+    removeSet(key,totalSets);
+  },600);
+}
+function cancelLongPress(){
+  clearTimeout(longPressTimer);
+}
+
+function removeSet(key,totalSets){
+  const current=setProgress[key]||0;
+  if(current===0)return;
+  const wasDone=checks[key];
+  checks[key]=false;
+  setProgress[key]=current-1;
+  skipRest();
+  if(wasDone){
+    renderWorkout();
+    updateProgress();
+    updateBtn();
+  } else {
+    renderPips(key,current-1,totalSets,false);
+    updateProgress();
+    updateBtn();
+  }
+  // brief haptic-like flash
+  const row=document.getElementById(`exrow-${key}`);
+  if(row){row.style.opacity="0.5";setTimeout(()=>row.style.opacity="1",200);}
+}
+// Called when user taps the set counter area
+function addSet(key,secType,totalSets){
+  if(checks[key])return;
+  // Must assess before starting
+  if(!assessedToday){openAssessment();return;}
+  const current=setProgress[key]||0;
+  const next=current+1;
+  const w=WD[activeDay];
+  const parts=key.split("-"),si=parseInt(parts[1]),ei=parseInt(parts[2]);
+  const ex=w.s[si].exs[ei];
+
+  // Trigger 3-2-1 countdown first, then rest timer after
+  startCountdown(ex.n, ()=>{
+    if(next<totalSets){
+      setProgress[key]=next;
+      const isHigh=HIGH_INTENSITY_KW.some(k=>ex.n.includes(k));
+      const dur=secType==="w"?15:isHigh?90:60;
+      playSound("rest");
+      triggerTimer({
+        duration:dur,
+        mode:"rest",
+        label:secType==="w"?"熱身組間 · 15秒":`第 ${next}/${totalSets} 組完成 · ${dur}秒休息`
+      },ex.n);
+      renderPips(key,next,totalSets,false);
+    } else {
+      setProgress[key]=totalSets;
+      checks[key]=true;
+      const sec=w.s[si];
+      const config=getTimerConfig(sec.t,ex.n,ex.s,true);
+      playSound("rest");
+      triggerTimer(config,ex.n);
+      renderWorkout();
+      updateProgress();
+      updateBtn();
+    }
+  });
+}
+
+function renderPips(key,doneSets,totalSets,isDone){
+  const row=document.getElementById(`exrow-${key}`);
+  if(!row)return;
+  const track=row.querySelector(".set-counter-track");
+  const label=row.querySelector(".set-counter-label");
+  if(track){
+    track.innerHTML=Array.from({length:totalSets},(_,i)=>{
+      const pipClass=i<doneSets?(i===totalSets-1&&doneSets===totalSets?"set-pip done-last":"set-pip done"):"set-pip";
+      return`<div class="${pipClass}"></div>`;
+    }).join("");
+  }
+  if(label){
+    label.textContent=isDone?"✓":`${doneSets}/${totalSets}`;
+    label.className="set-counter-label"+(doneSets===totalSets?" full":"");
+  }
+}
+
+// ─────────────── AUTO REST / HOLD POPUP ───────────────
+// w=warmup: 15s rest between exercises (keep warm)
+// m=main: 60s rest (90s for high intensity)
+// c=cooldown: hold timer = actual stretch duration from sets text
+// h=hiit: skip (has own timer)
+const HIGH_INTENSITY_KW=["波比","跳躍深蹲","弓步跳","高抬腿"];
+const REST_CIRC=2*Math.PI*20;
+let restSec=0,restPreset=60,restInterval=null,restMode="rest";
+
+function parseHoldSec(setsStr){
+  const minMatch=setsStr.match(/(\d+)分鐘/);
+  if(minMatch)return parseInt(minMatch[1])*60;
+  const secMatch=setsStr.match(/(\d+)秒/);
+  if(secMatch)return parseInt(secMatch[1]);
+  return 0;
+}
+
+function getTimerConfig(secType,exName,setsStr,isLastSet=false){
+  if(secType==="h")return null;
+  if(secType==="c"){
+    const hold=parseHoldSec(setsStr);
+    if(hold>0)return{duration:hold,mode:"hold",label:`保持伸展 ${hold}秒`};
+    return null;
+  }
+  if(secType==="w"){
+    if(isLastSet)return{duration:20,mode:"rest",label:"熱身動作完成 · 換下一個"};
+    return{duration:15,mode:"rest",label:"熱身組間休息 · 15秒"};
+  }
+  // main training
+  const isHigh=HIGH_INTENSITY_KW.some(k=>exName.includes(k));
+  const dur=isHigh?90:60;
+  if(isLastSet)return{duration:isHigh?120:90,mode:"next",label:`全部組完成！換下一個動作 · ${isHigh?120:90}秒`};
+  return{duration:dur,mode:"rest",label:isHigh?"高強度 · 90秒組間休息":"一般強度 · 60秒組間休息"};
+}
+
+function triggerTimer(config,exName){
+  if(!config)return;
+  clearInterval(restInterval);
+  restPreset=config.duration;restSec=config.duration;restMode=config.mode;
+  document.getElementById("restPopupName").textContent=exName;
+  document.getElementById("restPopupIntensity").textContent=config.label;
+  // colors: hold=teal, next=warm orange, rest=yellow
+  const color=restMode==="hold"?"#4ecdc4":restMode==="next"?"#ffb347":"#d4ff4e";
+  document.getElementById("restPopupArc").style.stroke=color;
+  document.getElementById("restPopupNum").style.color=color;
+  document.getElementById("restPopup").style.display="flex";
+  renderRestPopup();
+  restInterval=setInterval(()=>{
+    if(restSec>1){
+      restSec--;
+      if(restSec<=5)playSound("tick");
+      renderRestPopup();
+    }
+    else{playSound("go");skipRest();}
+  },1000);
+}
+
+function renderRestPopup(){
+  const pct=restSec/restPreset;
+  document.getElementById("restPopupArc").style.strokeDashoffset=REST_CIRC*(1-pct);
+  const n=document.getElementById("restPopupNum");
+  if(restSec===0){n.textContent="✓";return;}
+  n.textContent=restSec;
+  if(restSec<=5){
+    n.style.color="#ff6b35";
+    document.getElementById("restPopupArc").style.stroke="#ff6b35";
+  }
+}
+
+function skipRest(){
+  clearInterval(restInterval);
+  document.getElementById("restPopup").style.display="none";
+}
+
+function toggle(key){} // legacy stub
+
+function updateProgress(){
+  const all=getKeys(),done=all.filter(k=>checks[k]).length,total=all.length;
+  const pct=total>0?Math.round(done/total*100):0;
+  const bar=document.querySelector(".prog-bar");
+  const lbl=document.querySelector(".prog-label span:last-child");
+  if(bar)bar.style.width=pct+"%";
+  if(lbl)lbl.textContent=done+"/"+total;
+}
+
+function updateBtn(){
+  const all=getKeys(),done=all.filter(k=>checks[k]).length,total=all.length,ready=done===total;
+  const b=document.getElementById("btnDone");
+  b.textContent=ready?"✓ 完成今日訓練！":`完成訓練 (${done}/${total})`;
+  b.className="btn-done"+(ready?" ready":"");
+}
+
+// Override markDone handled in user system above
+
+function resetChecks(){getKeys().forEach(k=>{delete checks[k];delete expanded[k];delete setProgress[k];});renderWorkout();}
+function switchDay(d){
+  activeDay=d;checks={};expanded={};setProgress={};
+  assessedToday=false;
+  renderTabs();renderWorkout();renderWeek();
+  document.getElementById("pageWorkout").scrollTop=0;
+  // Ask assessment at start of each training day
+  setTimeout(()=>openAssessment(),300);
+}
+
+// ─────────────── REST TIMER ───────────────
+let tSec=60,tPreset=60,tRunning=true,tInterval=null;
+const CIRC=2*Math.PI*46;
+
+function openTimer(){document.getElementById("timerOverlay").style.display="flex";tSec=tPreset;tRunning=true;startTI();renderTimer();}
+function closeTimer(){document.getElementById("timerOverlay").style.display="none";clearInterval(tInterval);}
+function setPreset(s){tPreset=s;tSec=s;tRunning=true;clearInterval(tInterval);startTI();document.querySelectorAll(".tp").forEach(b=>{b.className="tp"+(parseInt(b.textContent)===s?" on":"");});renderTimer();}
+function toggleTimer(){tRunning=!tRunning;if(tRunning)startTI();else clearInterval(tInterval);document.getElementById("tctrl").textContent=tRunning?"暫停":"繼續";}
+function startTI(){clearInterval(tInterval);tInterval=setInterval(()=>{if(tSec>0){tSec--;renderTimer();}else{clearInterval(tInterval);tRunning=false;document.getElementById("tctrl").textContent="繼續";}},1000);}
+function renderTimer(){const pct=tSec/tPreset;document.getElementById("tarc").style.strokeDashoffset=CIRC*(1-pct);const el=document.getElementById("tnum");el.textContent=tSec===0?"GO!":tSec;el.className="tnum"+(tSec===0?" go":"");}
+
+// ─────────────── HIIT TIMER ───────────────
+const HIIT_WORK=40,HIIT_REST=20,HIIT_ROUNDS=3,HIIT_ROUND_REST=90;
+const HIIT_CIRC=2*Math.PI*68;
+let hiitExs=[],hiitPhase="countdown",hiitSec=5,hiitExIdx=0,hiitRound=1,hiitRunning=false,hiitInterval=null;
+
+function openHiit(secIdx){
+  const w=WD[activeDay];
+  const sec=w.s[secIdx];
+  hiitExs=sec.exs.map(e=>e.n);
+  hiitPhase="countdown";hiitSec=5;hiitExIdx=0;hiitRound=1;hiitRunning=true;
+  document.getElementById("hiitOverlay").style.display="flex";
+  renderHiitDots();
+  renderHiit();
+  startHiitInterval();
+}
+
+function closeHiit(){document.getElementById("hiitOverlay").style.display="none";clearInterval(hiitInterval);}
+
+function toggleHiit(){
+  hiitRunning=!hiitRunning;
+  if(hiitRunning)startHiitInterval();else clearInterval(hiitInterval);
+  document.getElementById("hiitCtrl").textContent=hiitRunning?"暫停":"繼續";
+}
+
+function startHiitInterval(){
+  clearInterval(hiitInterval);
+  hiitInterval=setInterval(()=>{
+    if(hiitSec>1){hiitSec--;renderHiit();return;}
+    // advance phase
+    if(hiitPhase==="countdown"){hiitPhase="work";hiitSec=HIIT_WORK;}
+    else if(hiitPhase==="work"){
+      if(hiitExIdx<hiitExs.length-1){hiitPhase="rest";hiitSec=HIIT_REST;}
+      else{
+        // end of round
+        if(hiitRound<HIIT_ROUNDS){hiitPhase="roundrest";hiitSec=HIIT_ROUND_REST;}
+        else{hiitPhase="done";clearInterval(hiitInterval);renderHiit();return;}
+      }
+    }
+    else if(hiitPhase==="rest"){hiitExIdx++;hiitPhase="work";hiitSec=HIIT_WORK;}
+    else if(hiitPhase==="roundrest"){hiitRound++;hiitExIdx=0;hiitPhase="work";hiitSec=HIIT_WORK;}
+    renderHiit();
+    renderHiitDots();
+  },1000);
+}
+
+function renderHiitDots(){
+  document.getElementById("hiitDots").innerHTML=hiitExs.map((_,i)=>{
+    const cls=i<hiitExIdx?"done":i===hiitExIdx?"current":"";
+    return`<div class="hiit-dot ${cls}"></div>`;
+  }).join("");
+}
+
+function renderHiit(){
+  const phaseEl=document.getElementById("hiitPhase");
+  const nameEl=document.getElementById("hiitExName");
+  const nextEl=document.getElementById("hiitNext");
+  const numEl=document.getElementById("hiitNum");
+  const arcEl=document.getElementById("hiitArc");
+  const roundEl=document.getElementById("hiitRoundInfo");
+
+  let phaseTxt,phaseClass,total,nameText,nextText="";
+  if(hiitPhase==="countdown"){phaseTxt="準備";phaseClass="";nameText="準備開始";total=5;nextText=`即將開始：${hiitExs[0]}`;}
+  else if(hiitPhase==="work"){phaseTxt="動作";phaseClass="work";nameText=hiitExs[hiitExIdx];total=HIIT_WORK;
+    const ni=hiitExIdx+1<hiitExs.length?`下一個：${hiitExs[hiitExIdx+1]}`:"最後一個！";nextText=ni;}
+  else if(hiitPhase==="rest"){phaseTxt="休息";phaseClass="rest";nameText="休息 💧";total=HIIT_REST;nextText=`下一個：${hiitExs[hiitExIdx+1]||""}`;}
+  else if(hiitPhase==="roundrest"){phaseTxt="輪間休息";phaseClass="rest";nameText=`第 ${hiitRound} 輪完成！`;total=HIIT_ROUND_REST;nextText=`準備第 ${hiitRound+1} 輪`;}
+  else if(hiitPhase==="done"){phaseTxt="完成！";phaseClass="work";nameText="🔥 太棒了！";total=1;nextText="記得收操伸展";}
+
+  phaseEl.textContent=phaseTxt;
+  phaseEl.className="hiit-phase"+(phaseClass?" "+phaseClass:"");
+  nameEl.textContent=nameText;
+  nextEl.textContent=nextText;
+  numEl.textContent=hiitSec;
+  numEl.style.color=phaseClass==="work"?"#ff6b35":phaseClass==="rest"?"#4ecdc4":"#f0f0f0";
+  arcEl.style.stroke=phaseClass==="work"?"#ff6b35":"#4ecdc4";
+  arcEl.style.strokeDashoffset=HIIT_CIRC*(1-hiitSec/Math.max(total,1));
+  roundEl.textContent=`第 ${hiitRound} 輪 / 共 ${HIIT_ROUNDS} 輪`;
+}
+
+// ─────────────── PAGE SWITCHING ───────────────
+let currentPage="workout";
+function switchPage(page){
+  currentPage=page;
+  document.getElementById("pageWorkout").classList.toggle("active",page==="workout");
+  document.getElementById("pageHistory").classList.toggle("active",page==="history");
+  document.getElementById("navWorkout").classList.toggle("active",page==="workout");
+  document.getElementById("navHistory").classList.toggle("active",page==="history");
+  document.getElementById("actionBar").style.display=page==="workout"?"flex":"none";
+  document.getElementById("dayTabs").style.display=page==="workout"?"flex":"none";
+  if(page==="history")renderHistory();
+}
+
+// ─────────────── HISTORY & RECORDS ───────────────
+function renderHistory(){
+  const el=document.getElementById("histContent");
+  const dates=Object.keys(history).sort((a,b)=>b.localeCompare(a));
+  if(dates.length===0){
+    el.innerHTML=`<div class="hist-empty">還沒有訓練紀錄<br><span style="font-size:11px;margin-top:8px;display:block">完成訓練後會自動記錄在這裡</span></div>`;
+    return;
+  }
+
+  // Build heatmap for last 10 weeks (70 days)
+  const today=new Date();
+  const cells=[];
+  for(let i=69;i>=0;i--){
+    const d=new Date(today);d.setDate(today.getDate()-i);
+    cells.push(d.toISOString().split("T")[0]);
+  }
+  // day-of-week labels
+  const dowLabels=["日","一","二","三","四","五","六"];
+  let heatHtml=`<div class="hist-month-title">訓練熱力圖</div>
+  <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:6px">${dowLabels.map(d=>`<div style="font-size:9px;color:var(--muted);text-align:center;font-family:'DM Mono',monospace">${d}</div>`).join("")}</div>
+  <div class="heatmap">`;
+  // pad start
+  const firstDow=new Date(cells[0]).getDay();
+  for(let i=0;i<firstDow;i++)heatHtml+=`<div class="hm-cell" style="opacity:0"></div>`;
+  cells.forEach(dk=>{
+    const isToday=dk===today.toISOString().split("T")[0];
+    const hasData=!!history[dk];
+    heatHtml+=`<div class="hm-cell${hasData?" has-data":""}${isToday?" today-cell":""}" onclick="scrollToDay('${dk}')" title="${dk}"></div>`;
+  });
+  heatHtml+=`</div>`;
+
+  // Day entries
+  let entriesHtml="";
+  dates.forEach(dk=>{
+    const rec=history[dk];
+    const w=WD[rec.dayKey];
+    if(!w)return;
+    const dateObj=new Date(dk+"T00:00:00");
+    const dateStr=`${dateObj.getMonth()+1}/${dateObj.getDate()} (${["日","一","二","三","四","五","六"][dateObj.getDay()]})`;
+    let exRows="";
+    w.s.forEach((sec,si)=>{
+      if(sec.t==="h")return;
+      sec.exs.forEach((ex,ei)=>{
+        const key=`${rec.dayKey}-${si}-${ei}`;
+        const done=rec.exProgress[key];
+        if(!done)return;
+        const total=parseTotalSets(ex.s);
+        exRows+=`<div class="hist-ex-row">
+          <span class="hist-ex-name">${ex.n}</span>
+          <span class="hist-ex-sets">${done}/${total} 組</span>
+        </div>`;
+      });
+    });
+    entriesHtml+=`<div class="hist-day-detail" id="histday-${dk}">
+      <div class="hist-day-title">
+        <span>${w.e} ${w.title} · ${dateStr}</span>
+        <span class="hist-day-badge">${w.m} min</span>
+      </div>
+      ${exRows||'<div style="font-size:12px;color:var(--muted)">無詳細紀錄</div>'}
+    </div>`;
+  });
+
+  el.innerHTML=heatHtml+entriesHtml;
+}
+
+function scrollToDay(dk){
+  const el=document.getElementById(`histday-${dk}`);
+  if(el)el.scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+// ─────────────── INIT ───────────────
+initUser();
+setTimeout(()=>openAssessment(),500);
+</script>
+</body>
+</html>
