@@ -244,7 +244,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-seri
 
   <!-- Action Bar -->
   <div style="position:fixed;bottom:56px;left:50%;transform:translateX(-50%);width:100%;max-width:480px;padding:6px 16px;background:linear-gradient(transparent,var(--bg) 40%);display:flex;gap:8px;z-index:40" id="actionBar">
-    <button class="btn-reset" onclick="resetChecks()">重置</button>
+    <button class="btn-reset" onmousedown="startResetPress()" ontouchstart="startResetPress()" onmouseup="cancelResetPress()" ontouchend="cancelResetPress()" onmouseleave="cancelResetPress()" id="btnReset">重置</button>
     <button class="btn-done" id="btnDone" onclick="markDone()">完成訓練</button>
   </div>
 </div>
@@ -262,15 +262,6 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-seri
       <button class="assess-opt" onclick="selectAssess(5)">💪 超好！全力以赴</button>
     </div>
     <button class="tclose" onclick="closeAssessment()">取消</button>
-  </div>
-</div>
-
-<!-- Countdown Overlay (3-2-1-GO) -->
-<div class="overlay" id="countdownOverlay" style="display:none;background:rgba(0,0,0,.92)">
-  <div style="text-align:center">
-    <div style="font-size:14px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:2px;margin-bottom:16px" id="cdExName"></div>
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:140px;line-height:1;letter-spacing:4px;transition:all .15s" id="cdNum">3</div>
-    <div style="font-size:13px;color:var(--muted);margin-top:16px">準備好姿勢！</div>
   </div>
 </div>
 
@@ -383,19 +374,19 @@ const WD_YINJIE={
         avoid:"頸部不要過度後仰；量力而為，不要強迫高度"},
     ]},
     {t:"c",l:"收操伸展",d:"5 min",exs:[
-      {n:"胸肌牆角伸展 🧱",s:"30秒×2",brief:"伸展胸肌",
+      {n:"胸肌牆角伸展 🧱",s:"25秒×2",brief:"伸展胸肌",
         muscles:["胸大肌","三角肌前束"],
         cues:["🧱 面對牆角，雙臂抬至肩膀高度，手肘彎曲90°貼牆","🚶 身體緩慢向前靠近牆角，感覺胸肌被拉開","😮‍💨 深呼吸，維持30秒不要憋氣"],
         avoid:"不要讓頸部向前推進；感到疼痛立刻停止"},
-      {n:"三頭肌過頭伸展",s:"30秒×每側",brief:"伸展三頭",
+      {n:"三頭肌過頭伸展",s:"25秒×每側",brief:"伸展三頭",
         muscles:["三頭肌"],
         cues:["💪 一手舉過頭頂，手肘彎曲，手心觸摸後頸或上背","🤝 另一手握住彎曲手肘輕輕向下壓","😌 感覺上臂後側伸展，維持30秒","🔄 換邊重複"],
         avoid:"不要拉扯過猛；頸部保持中立不要前傾"},
-      {n:"肩膀前側伸展",s:"30秒×2",brief:"伸展前三角肌",
+      {n:"肩膀前側伸展",s:"25秒×2",brief:"伸展前三角肌",
         muscles:["三角肌前束","胸小肌"],
         cues:["🙏 雙手在身後十指交扣","⬆️ 挺胸，肩胛骨向後夾，雙手輕輕向後下方延伸","🙄 頭微微抬起","😮‍💨 深呼吸維持30秒"],
         avoid:"不要過度抬頭；雙手不要用力拉扯"},
-      {n:"嬰兒式",s:"40秒",brief:"放鬆肩背",
+      {n:"嬰兒式",s:"25秒",brief:"放鬆肩背",
         muscles:["背闊肌","脊椎伸肌","肩關節"],
         cues:["🐾 跪坐，臀部往後坐向腳跟","🙌 雙手向前伸直，額頭放鬆貼地","😮‍💨 每次呼氣讓身體更下沉","🌊 感覺整個背部被拉長放鬆"],
         avoid:"若膝蓋不適可在臀部下方墊枕頭"},
@@ -447,23 +438,23 @@ const WD_YINJIE={
         avoid:"不要讓腳踝內翻或外翻；動作要慢，感受小腿肌肉全程收縮"},
     ]},
     {t:"c",l:"收操伸展",d:"5 min",exs:[
-      {n:"股四頭肌伸展",s:"35秒×每腳",brief:"伸展大腿前側",
+      {n:"股四頭肌伸展",s:"25秒×每腳",brief:"伸展大腿前側",
         muscles:["股四頭肌","髖屈肌"],
         cues:["🧱 扶牆站立，單腳後勾，手握腳踝","🦵 保持膝蓋併攏（伸展腳與站立腳並排）","⬆️ 輕輕往後上方提起腳踝，感受大腿前側伸展","😮‍💨 深呼吸維持35秒"],
         avoid:"不要讓伸展側的膝蓋向外偏移；若平衡困難可扶牆"},
-      {n:"低弓步髖屈肌伸展",s:"35秒×每側",brief:"伸展髖屈肌",
+      {n:"低弓步髖屈肌伸展",s:"25秒×每側",brief:"伸展髖屈肌",
         muscles:["髂腰肌","股直肌"],
         cues:["🧎 一腳向前成弓步，後腳膝蓋跪地","⬆️ 身體直立，重心略向前移","😌 感覺後腳髖關節前方被拉開","😮‍💨 維持35秒不要憋氣，可以輕輕左右擺動增加伸展感"],
         avoid:"前腳膝蓋不要超過腳尖太多；腰部不要過度後仰"},
-      {n:"坐姿腿後側伸展",s:"35秒×2",brief:"伸展腿後腱",
+      {n:"坐姿腿後側伸展",s:"25秒×2",brief:"伸展腿後腱",
         muscles:["腿後腱肌群","小腿"],
         cues:["🧘 坐地，雙腿伸直向前","🙏 上身從髖部往前傾（不是彎腰駝背）","🎯 感覺大腿後側被拉伸，背部盡量保持平直","😮‍💨 深呼吸，每次吐氣嘗試更向前傾"],
         avoid:"不要刻意彎腰駝背；膝蓋可以微彎不要鎖死"},
-      {n:"臀部鴿式伸展",s:"35秒×每側",brief:"伸展梨狀肌",
+      {n:"臀部鴿式伸展",s:"25秒×每側",brief:"伸展梨狀肌",
         muscles:["梨狀肌","臀大肌","外旋六肌"],
         cues:["🛌 仰躺，一腳膝蓋彎曲踩地","🦵 將另一腳的外踝搭在踩地腳的大腿上","🤗 雙手環抱踩地腳的大腿後側向胸口拉","😌 感覺搭腿側的臀部深層被伸展"],
         avoid:"頸部放鬆貼地；不要讓骨盆歪斜"},
-      {n:"仰躺脊椎扭轉",s:"30秒×每側",brief:"放鬆腰椎",
+      {n:"仰躺脊椎扭轉",s:"25秒×每側",brief:"放鬆腰椎",
         muscles:["腰方肌","脊椎旋轉肌","梨狀肌"],
         cues:["🛌 仰躺，雙臂向兩側打開呈T字形","🦵 一腳膝蓋彎曲橫倒向對側地板","👀 頭轉向膝蓋倒下的反方向","😮‍💨 深呼吸放鬆，維持30秒換邊"],
         avoid:"肩膀盡量保持貼地；動作輕柔不要強迫"},
@@ -515,15 +506,15 @@ const WD_YINJIE={
         avoid:"臀部不要高過肩膀；手腕不適可改用拳頭支撐"},
     ]},
     {t:"c",l:"收操伸展",d:"5 min",exs:[
-      {n:"背闊肌伸展（扶椅）🪑",s:"30秒×每側",brief:"伸展背闊肌",
+      {n:"背闊肌伸展（扶椅）🪑",s:"25秒×每側",brief:"伸展背闊肌",
         muscles:["背闊肌","大圓肌"],
         cues:["🪑 站在椅子旁，單手扶椅背","🏋️ 上身向扶椅側傾斜，感覺對側背部側面被拉開","😮‍💨 深呼吸維持30秒"],
         avoid:"不要彎腰；膝蓋微彎"},
-      {n:"跨胸肩膀伸展",s:"30秒×每側",brief:"伸展後三角肌",
+      {n:"跨胸肩膀伸展",s:"25秒×每側",brief:"伸展後三角肌",
         muscles:["三角肌後束","菱形肌"],
         cues:["💪 一手伸直拉過胸前，約與肩同高","🤝 另一手在手肘處輕輕向身體壓","😌 感覺肩膀後側伸展","😮‍💨 維持30秒換邊"],
         avoid:"不要轉動肩膀；頸部保持中立"},
-      {n:"嬰兒式（廣角）",s:"40秒",brief:"放鬆背部",
+      {n:"嬰兒式（廣角）",s:"25秒",brief:"放鬆背部",
         muscles:["背闊肌","脊椎伸肌","髖屈肌"],
         cues:["🐾 跪姿，雙膝打開略寬於肩","🙌 臀部往後坐向腳跟，雙手向前爬行","😌 額頭放鬆貼地，感覺整個背部被拉長"],
         avoid:"若膝蓋不適可墊毯子"},
@@ -583,23 +574,23 @@ const WD_YINJIE={
         muscles:["心肺"],
         cues:["🚶 原地或繞房間慢步走","😮‍💨 深呼吸，讓心率逐漸降低","🚫 絕對不要訓練後立刻坐下或躺下"],
         avoid:"HIIT後立刻停止容易頭暈；至少走2分鐘再伸展"},
-      {n:"站姿體前彎",s:"40秒",brief:"伸展腿後側＋背部",
+      {n:"站姿體前彎",s:"25秒",brief:"伸展腿後側＋背部",
         muscles:["腿後腱肌群","豎脊肌"],
         cues:["🧍 雙腿伸直（或膝蓋微彎），上身從髖部慢慢向下","🙌 雙手自然下垂，讓重力帶動伸展","😮‍💨 每次吐氣身體再往下多一點點"],
         avoid:"不要強迫低頭彎腰，從髖部折疊"},
-      {n:"低弓步髖屈肌伸展",s:"35秒×每側",brief:"伸展髖屈肌",
+      {n:"低弓步髖屈肌伸展",s:"25秒×每側",brief:"伸展髖屈肌",
         muscles:["髂腰肌","股直肌"],
         cues:["🧎 一腳弓步，後腳膝蓋跪地","⬆️ 上身直立，重心略前移","😌 感覺後腳髖關節前方被拉開"],
         avoid:"前腳膝蓋不超過腳尖太多；腰部不要過度後仰"},
-      {n:"股四頭肌伸展（扶牆）🧱",s:"30秒×每腳",brief:"伸展大腿前側",
+      {n:"股四頭肌伸展（扶牆）🧱",s:"25秒×每腳",brief:"伸展大腿前側",
         muscles:["股四頭肌","髖屈肌"],
         cues:["🧱 扶牆站立，單腳後勾握腳踝","🦵 膝蓋保持併攏，感受大腿前側伸展","😮‍💨 深呼吸維持"],
         avoid:"不要讓身體前傾代償"},
-      {n:"胸肌牆角伸展 🧱",s:"30秒×2",brief:"放鬆胸肌",
+      {n:"胸肌牆角伸展 🧱",s:"25秒×2",brief:"放鬆胸肌",
         muscles:["胸大肌","三角肌前束"],
         cues:["🧱 面對牆角，手肘彎曲90°抵牆","🚶 身體向前靠，感覺胸肌伸展","😮‍💨 深呼吸放鬆"],
         avoid:"不要頸部前傾代償"},
-      {n:"仰躺全身伸展",s:"40秒",brief:"放鬆全身",
+      {n:"仰躺全身伸展",s:"25秒",brief:"放鬆全身",
         muscles:["全身"],
         cues:["🛌 仰躺，雙手舉過頭頂伸直","🦵 雙腿向遠端延伸","🌊 感覺從指尖到腳尖被拉長","😮‍💨 深呼吸，讓身體完全放鬆"],
         avoid:"頸部保持中立，不要過度後仰"},
@@ -644,15 +635,15 @@ const WD_AURA={
         avoid:"頸部不要過度後仰"},
     ]},
     {t:"c",l:"收操伸展",d:"5 min",exs:[
-      {n:"胸肌牆角伸展 🧱",s:"30秒×2",brief:"伸展胸肌",
+      {n:"胸肌牆角伸展 🧱",s:"25秒×2",brief:"伸展胸肌",
         muscles:["胸大肌","三角肌前束"],
         cues:["🧱 面對牆角，手肘彎曲90°貼牆","🚶 身體緩慢向前，感覺胸肌被拉開","😮‍💨 深呼吸維持30秒"],
         avoid:"感到疼痛立刻停止"},
-      {n:"三頭肌過頭伸展",s:"30秒×每側",brief:"伸展三頭",
+      {n:"三頭肌過頭伸展",s:"25秒×每側",brief:"伸展三頭",
         muscles:["三頭肌"],
         cues:["💪 一手舉過頭，手肘彎曲","🤝 另一手輕壓手肘","😌 感覺上臂後側伸展"],
         avoid:"不要拉扯過猛"},
-      {n:"嬰兒式",s:"40秒",brief:"放鬆肩背",
+      {n:"嬰兒式",s:"25秒",brief:"放鬆肩背",
         muscles:["背闊肌","脊椎伸肌"],
         cues:["🐾 跪坐，臀部往後坐向腳跟","🙌 雙手向前伸直，額頭放鬆貼地","😮‍💨 每次呼氣讓身體更下沉"],
         avoid:"膝蓋不適可墊枕頭"},
@@ -696,15 +687,15 @@ const WD_AURA={
         avoid:"不要用手拉頸部；腰部始終貼地"},
     ]},
     {t:"c",l:"收操伸展",d:"5 min",exs:[
-      {n:"股四頭肌伸展（扶牆）🧱",s:"35秒×每腳",brief:"伸展大腿前側",
+      {n:"股四頭肌伸展（扶牆）🧱",s:"25秒×每腳",brief:"伸展大腿前側",
         muscles:["股四頭肌"],
         cues:["🧱 扶牆站立，單腳後勾握腳踝","🦵 膝蓋保持併攏","😮‍💨 深呼吸維持"],
         avoid:"不要讓身體前傾代償"},
-      {n:"臀部鴿式伸展",s:"40秒×每側",brief:"伸展梨狀肌",
+      {n:"臀部鴿式伸展",s:"25秒×每側",brief:"伸展梨狀肌",
         muscles:["梨狀肌","臀大肌"],
         cues:["🛌 仰躺，一腳外踝搭在另一腳大腿上","🤗 雙手環抱後側大腿向胸口拉","😌 感覺臀部深層伸展"],
         avoid:"頸部放鬆貼地"},
-      {n:"坐姿腿後側伸展",s:"35秒×2",brief:"伸展腿後腱",
+      {n:"坐姿腿後側伸展",s:"25秒×2",brief:"伸展腿後腱",
         muscles:["腿後腱肌群"],
         cues:["🧘 坐地雙腿伸直","🙏 上身從髖部前傾，背部盡量平直","😮‍💨 每次吐氣更往前"],
         avoid:"不要刻意彎腰駝背"},
@@ -756,11 +747,11 @@ const WD_AURA={
         muscles:["心肺"],
         cues:["🚶 原地慢走","😮‍💨 深呼吸","🚫 不要立刻坐下"],
         avoid:"HIIT後立刻停止容易頭暈"},
-      {n:"低弓步髖屈肌伸展",s:"35秒×每側",brief:"伸展髖屈肌",
+      {n:"低弓步髖屈肌伸展",s:"25秒×每側",brief:"伸展髖屈肌",
         muscles:["髂腰肌"],
         cues:["🧎 弓步跪地，重心前移","😌 感覺後腳髖前方伸展"],
         avoid:"腰部不要過度後仰"},
-      {n:"仰躺全身伸展",s:"40秒",brief:"放鬆全身",
+      {n:"仰躺全身伸展",s:"25秒",brief:"放鬆全身",
         muscles:["全身"],
         cues:["🛌 仰躺，雙手舉過頭頂","🌊 從指尖到腳尖盡力拉長","😮‍💨 深呼吸放鬆"],
         avoid:"頸部保持中立"},
@@ -804,7 +795,7 @@ const WD_AURA={
         avoid:"髖部不要前後偏移"},
     ]},
     {t:"c",l:"收操伸展",d:"5 min",exs:[
-      {n:"嬰兒式（廣角）",s:"40秒",brief:"放鬆背部",
+      {n:"嬰兒式（廣角）",s:"25秒",brief:"放鬆背部",
         muscles:["背闊肌","脊椎伸肌"],
         cues:["🐾 跪姿，雙膝打開略寬於肩","🙌 臀部往後坐，雙手向前爬","😌 額頭放鬆貼地"],
         avoid:"膝蓋不適可墊毯子"},
@@ -812,7 +803,7 @@ const WD_AURA={
         muscles:["腰椎伸肌"],
         cues:["🛌 仰躺，雙手環抱膝蓋靠胸","🌀 輕輕左右搖擺","😮‍💨 深呼吸放鬆"],
         avoid:"動作輕柔"},
-      {n:"仰躺脊椎扭轉",s:"30秒×每側",brief:"放鬆腰椎",
+      {n:"仰躺脊椎扭轉",s:"25秒×每側",brief:"放鬆腰椎",
         muscles:["腰方肌","梨狀肌"],
         cues:["🛌 仰躺，雙臂展開","🦵 一腳膝蓋橫倒向對側","👀 頭轉向反方向","😮‍💨 深呼吸放鬆"],
         avoid:"肩膀盡量貼地"},
@@ -1013,20 +1004,30 @@ function toggleExpand(key){
 // ─────────────── BODY ASSESSMENT ───────────────
 let todayAssessScore=0;
 let assessedToday=false;
+let assessedDate=""; // track which date was assessed
 
 function openAssessment(){
+  const todayStr=new Date().toISOString().split("T")[0];
+  // Only show once per day per user
+  const key=currentUser+"_assessed_"+todayStr;
+  if(localStorage.getItem(key)){
+    assessedToday=true;
+    return;
+  }
   document.getElementById("assessOverlay").style.display="flex";
   document.querySelectorAll(".assess-opt").forEach(b=>b.classList.remove("sel"));
 }
 
 function closeAssessment(){
-  // Can't close without selecting — force a choice
   document.getElementById("assessOverlay").style.display="none";
 }
 
 function selectAssess(score){
   todayAssessScore=score;
   assessedToday=true;
+  // Save to localStorage so it doesn't show again today
+  const todayStr=new Date().toISOString().split("T")[0];
+  try{localStorage.setItem(currentUser+"_assessed_"+todayStr,score);}catch{}
   document.querySelectorAll(".assess-opt").forEach((b,i)=>{
     b.classList.toggle("sel",i===score-1);
   });
@@ -1052,38 +1053,22 @@ function showAssessFeedback(score){
   setTimeout(()=>toast.remove(),3000);
 }
 
-// ─────────────── 3-2-1 COUNTDOWN ───────────────
-let cdInterval=null;
-let cdCallback=null;
-
-function startCountdown(exName, callback){
-  cdCallback=callback;
-  let count=3;
-  document.getElementById("cdExName").textContent=exName;
-  const numEl=document.getElementById("cdNum");
-  numEl.textContent="3";
-  numEl.className="";
-  document.getElementById("countdownOverlay").style.display="flex";
-
-  playSound("tick");
-
-  cdInterval=setInterval(()=>{
-    count--;
-    if(count>0){
-      numEl.textContent=count;
-      numEl.className="";
-      playSound("tick");
-    } else {
-      numEl.textContent="GO!";
-      numEl.className="go";
-      playSound("go");
-      setTimeout(()=>{
-        document.getElementById("countdownOverlay").style.display="none";
-        clearInterval(cdInterval);
-        if(cdCallback)cdCallback();
-      },600);
-    }
-  },1000);
+// ─────────────── LONG PRESS RESET ───────────────
+let resetPressTimer=null;
+function startResetPress(){
+  const btn=document.getElementById("btnReset");
+  btn.style.transition="background .8s";
+  btn.style.background="rgba(255,107,53,.3)";
+  resetPressTimer=setTimeout(()=>{
+    resetChecks();
+    btn.style.background="";
+  },800);
+}
+function cancelResetPress(){
+  clearTimeout(resetPressTimer);
+  const btn=document.getElementById("btnReset");
+  btn.style.background="";
+  btn.style.transition="";
 }
 const AudioCtx=window.AudioContext||window.webkitAudioContext;
 let audioCtx=null;
@@ -1153,39 +1138,34 @@ function removeSet(key,totalSets){
 // Called when user taps the set counter area
 function addSet(key,secType,totalSets){
   if(checks[key])return;
-  // Must assess before starting
   if(!assessedToday){openAssessment();return;}
   const current=setProgress[key]||0;
   const next=current+1;
   const w=WD[activeDay];
   const parts=key.split("-"),si=parseInt(parts[1]),ei=parseInt(parts[2]);
   const ex=w.s[si].exs[ei];
+  const sec=w.s[si];
 
-  // Trigger 3-2-1 countdown first, then rest timer after
-  startCountdown(ex.n, ()=>{
-    if(next<totalSets){
-      setProgress[key]=next;
-      const isHigh=HIGH_INTENSITY_KW.some(k=>ex.n.includes(k));
-      const dur=secType==="w"?15:isHigh?90:60;
-      playSound("rest");
-      triggerTimer({
-        duration:dur,
-        mode:"rest",
-        label:secType==="w"?"熱身組間 · 15秒":`第 ${next}/${totalSets} 組完成 · ${dur}秒休息`
-      },ex.n);
-      renderPips(key,next,totalSets,false);
-    } else {
-      setProgress[key]=totalSets;
-      checks[key]=true;
-      const sec=w.s[si];
-      const config=getTimerConfig(sec.t,ex.n,ex.s,true);
-      playSound("rest");
-      triggerTimer(config,ex.n);
-      renderWorkout();
-      updateProgress();
-      updateBtn();
-    }
-  });
+  if(next<totalSets){
+    setProgress[key]=next;
+    const isHigh=HIGH_INTENSITY_KW.some(k=>ex.n.includes(k));
+    const dur=secType==="w"?15:isHigh?45:30;
+    playSound("rest");
+    triggerTimer({
+      duration:dur,
+      mode:"rest",
+      label:secType==="w"?"熱身組間 · 15秒":`第 ${next}/${totalSets} 組完成 · ${dur}秒休息`
+    },ex.n);
+    renderPips(key,next,totalSets,false);
+  } else {
+    setProgress[key]=totalSets;
+    checks[key]=true;
+    const config=getTimerConfig(sec.t,ex.n,ex.s,true);
+    if(config){playSound("rest");triggerTimer(config,ex.n);}
+    renderWorkout();
+    updateProgress();
+    updateBtn();
+  }
 }
 
 function renderPips(key,doneSets,totalSets,isDone){
@@ -1224,20 +1204,15 @@ function parseHoldSec(setsStr){
 
 function getTimerConfig(secType,exName,setsStr,isLastSet=false){
   if(secType==="h")return null;
-  if(secType==="c"){
-    const hold=parseHoldSec(setsStr);
-    if(hold>0)return{duration:hold,mode:"hold",label:`保持伸展 ${hold}秒`};
-    return null;
-  }
+  if(secType==="c") return null;
   if(secType==="w"){
-    if(isLastSet)return{duration:20,mode:"rest",label:"熱身動作完成 · 換下一個"};
+    if(isLastSet)return{duration:15,mode:"rest",label:"熱身動作完成 · 換下一個"};
     return{duration:15,mode:"rest",label:"熱身組間休息 · 15秒"};
   }
-  // main training
   const isHigh=HIGH_INTENSITY_KW.some(k=>exName.includes(k));
-  const dur=isHigh?90:60;
-  if(isLastSet)return{duration:isHigh?120:90,mode:"next",label:`全部組完成！換下一個動作 · ${isHigh?120:90}秒`};
-  return{duration:dur,mode:"rest",label:isHigh?"高強度 · 90秒組間休息":"一般強度 · 60秒組間休息"};
+  const dur=isHigh?45:30;
+  if(isLastSet)return{duration:isHigh?60:45,mode:"next",label:`全部組完成！換下一個動作 · ${isHigh?60:45}秒`};
+  return{duration:dur,mode:"rest",label:isHigh?"高強度 · 45秒組間休息":"一般強度 · 30秒組間休息"};
 }
 
 function triggerTimer(config,exName){
@@ -1302,10 +1277,9 @@ function updateBtn(){
 function resetChecks(){getKeys().forEach(k=>{delete checks[k];delete expanded[k];delete setProgress[k];});renderWorkout();}
 function switchDay(d){
   activeDay=d;checks={};expanded={};setProgress={};
-  assessedToday=false;
   renderTabs();renderWorkout();renderWeek();
   document.getElementById("pageWorkout").scrollTop=0;
-  // Ask assessment at start of each training day
+  // Only ask if not yet assessed today
   setTimeout(()=>openAssessment(),300);
 }
 
@@ -1439,7 +1413,10 @@ function renderHistory(){
   cells.forEach(dk=>{
     const isToday=dk===today.toISOString().split("T")[0];
     const hasData=!!history[dk];
-    heatHtml+=`<div class="hm-cell${hasData?" has-data":""}${isToday?" today-cell":""}" onclick="scrollToDay('${dk}')" title="${dk}"></div>`;
+    const dateObj=new Date(dk+"T00:00:00");
+    const dow=dateObj.getDay();
+    const isRestDay=!SCHED[dow];
+    heatHtml+=`<div class="hm-cell${hasData?" has-data":""}${isToday?" today-cell":""}" onclick="heatmapClick('${dk}',${hasData},${isRestDay})"></div>`;
   });
   heatHtml+=`</div>`;
 
@@ -1475,6 +1452,25 @@ function renderHistory(){
   });
 
   el.innerHTML=heatHtml+entriesHtml;
+}
+
+function heatmapClick(dk,hasData,isRestDay){
+  if(hasData){
+    scrollToDay(dk);
+    return;
+  }
+  // Show small toast
+  const dateObj=new Date(dk+"T00:00:00");
+  const dateStr=`${dateObj.getMonth()+1}/${dateObj.getDate()}`;
+  const msg=isRestDay?`${dateStr} 休息日 😴`:`${dateStr} 尚無訓練紀錄`;
+  const existing=document.getElementById("heatToast");
+  if(existing)existing.remove();
+  const toast=document.createElement("div");
+  toast.id="heatToast";
+  toast.style.cssText=`position:fixed;bottom:120px;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 16px;font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;z-index:500;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.4)`;
+  toast.textContent=msg;
+  document.body.appendChild(toast);
+  setTimeout(()=>toast.remove(),2000);
 }
 
 function scrollToDay(dk){
